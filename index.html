@@ -45,15 +45,11 @@ body{
     padding:20px;
     box-sizing:border-box;
 }
-
 #leftPanel{ left:20px; }
 #rightPanel{ right:20px; }
 
 /* STABILITY */
-.monitorTitle{
-    font-family:'Audiowide';
-    margin-bottom:15px;
-}
+.monitorTitle{ font-family:'Audiowide'; margin-bottom:15px; }
 .barRow{ margin-bottom:12px; }
 .barLabel{ font-size:14px; margin-bottom:4px; }
 .barContainer{ background:#222; height:16px; width:100%; }
@@ -71,7 +67,6 @@ body{
     height:100%;
     transition:opacity 0.6s ease;
 }
-
 .cd{
     width:280px;
     height:280px;
@@ -115,56 +110,49 @@ body{
     text-align:center;
     transition:opacity 0.6s ease;
 }
-.spotlightTitle{
-    font-family:'Audiowide';
-    font-size:22px;
-    margin-bottom:6px;
-}
-.spotlightUnderline{
-    width:0;
-    height:3px;
-    margin:6px auto 12px auto;
-    background:linear-gradient(90deg,#00f7ff,#ff00ff);
-    animation:underline 1.2s ease forwards;
-}
-@keyframes underline{
-    from{width:0;}
-    to{width:60%;}
-}
-.glowPulse{
-    animation:pulse 1s ease;
-}
-@keyframes pulse{
-    0%{text-shadow:0 0 10px #00f7ff;}
-    50%{text-shadow:0 0 40px #ff00ff;}
-    100%{text-shadow:0 0 10px #00f7ff;}
-}
 
 /* PHOTO WALL */
 #photos{
     position:absolute;
-    top:400px;
+    top:380px;
     left:0;
     right:0;
     bottom:0;
     padding:40px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-content:flex-start;
     gap:40px;
 }
 
+/* FIXED PHOTO SIZE */
 .polaroid{
+    width:300px;
     background:white;
     color:black;
     padding:14px;
     text-align:center;
-    box-shadow:0 0 15px #ff00ff,0 0 30px #ff00ff;
+    box-shadow:0 0 20px #ff00ff,0 0 40px #ff00ff;
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* Slide-in animation */
+.polaroid.new{
+    opacity:0;
+    transform:translateY(80px);
+}
+.polaroid.show{
+    transition:all 0.6s ease;
+    opacity:1;
+    transform:translateY(0);
 }
 
 .polaroid img{
     width:100%;
     height:420px;
-    object-fit:contain;
+    object-fit:cover;
     background:black;
 }
 
@@ -267,29 +255,12 @@ function parseCSV(text){
     ).map(r=>r.map(c=>c.replace(/^"|"$/g,'')));
 }
 
-/* SPOTLIGHT */
-function rotateSpotlight(){
-    if(spotlightGuests.length===0)return;
-    const g=spotlightGuests[spotlightIndex%spotlightGuests.length];
-    const panel=document.getElementById("spotlightPanel");
-    panel.style.opacity=0;
-    setTimeout(()=>{
-        panel.innerHTML=`
-        <div class="spotlightTitle glowPulse">🔦 CLUB SPOTLIGHT</div>
-        <div class="spotlightUnderline"></div>
-        ${g.name} (${g.real}) – ${g.title}<br>
-        "${g.desc}"`;
-        panel.style.opacity=1;
-    },400);
-    spotlightIndex++;
-}
-setInterval(rotateSpotlight,8000);
-
-/* LOAD SHEET */
+/* LOAD SHEET WITH CACHE BUST */
 async function loadSheet(){
-    const response=await fetch(sheetURL);
+    const response=await fetch(sheetURL+"&cache="+Date.now());
     const text=await response.text();
     const rows=parseCSV(text);
+
     const container=document.getElementById("photos");
     spotlightGuests=[];
     let count=0;
@@ -298,6 +269,7 @@ async function loadSheet(){
     for(let i=1;i<rows.length;i++){
         const row=rows[i];
         if(row.length<5)continue;
+
         const character=row[0];
         const title=row[1];
         const desc=row[2];
@@ -308,15 +280,22 @@ async function loadSheet(){
             count++;
             lastArrival=character+" ("+real+")";
             spotlightGuests.push({name:character,title:title,desc:desc,real:real});
+
             if(!document.getElementById(character)){
                 const div=document.createElement("div");
-                div.className="polaroid";
+                div.className="polaroid new";
                 div.id=character;
                 div.innerHTML=`
                 <img src="photos/${photoFile}">
                 <div class="name">${character}</div>
                 <div class="real">${real}</div>`;
                 container.appendChild(div);
+
+                // Trigger animation
+                setTimeout(()=>{
+                    div.classList.add("show");
+                },50);
+
                 lastCheckInTime=Date.now();
                 if(idleMode)switchToVIP();
             }
@@ -330,7 +309,8 @@ async function loadSheet(){
         ${lastArrival}`;
 }
 
-setInterval(loadSheet,15000);
+/* Refresh every 5 seconds */
+setInterval(loadSheet,5000);
 loadSheet();
 </script>
 
