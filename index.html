@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Audiowide&display=swap" rel="stylesheet">
 
 <style>
-body {
+body{
     margin:0;
     background:#050816;
     color:white;
@@ -16,80 +16,73 @@ body {
 }
 
 /* HEADER */
-#header {
+#header{
     text-align:center;
     font-family:'Audiowide';
-    font-size:42px;
-    padding-top:20px;
+    font-size:40px;
+    padding-top:15px;
     color:#00f7ff;
-    text-shadow:0 0 25px #00f7ff;
+    text-shadow:0 0 20px #00f7ff;
 }
 
 /* COUNTDOWN */
-#countdown {
+#countdown{
     text-align:center;
     font-family:'Orbitron';
-    font-size:160px;
-    margin-top:10px;
-    background: linear-gradient(to bottom, #ffffff, #bbbbbb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size:150px;
+    margin-top:5px;
+    background:linear-gradient(to bottom,#ffffff,#bbbbbb);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
     text-shadow:0 0 60px #ff00ff;
 }
 
-/* PANELS */
-#leftPanel, #rightPanel {
+/* TOP PANELS */
+#leftPanel,#rightPanel{
     position:absolute;
-    bottom:120px;
-    width:380px;
-    height:420px;
+    top:20px;
+    width:360px;
     padding:20px;
     box-sizing:border-box;
 }
 
-#leftPanel { left:40px; }
-#rightPanel { right:40px; }
+#leftPanel{ left:20px; }
+#rightPanel{ right:20px; }
 
-/* STABILITY MONITOR */
-.monitorTitle {
+/* STABILITY */
+.monitorTitle{
     font-family:'Audiowide';
     margin-bottom:15px;
 }
-
-.barRow { margin-bottom:15px; }
-.barLabel { font-size:14px; margin-bottom:4px; }
-.barContainer { background:#222; height:18px; width:100%; }
-.barFill { height:100%; transition: width 1s ease; }
+.barRow{ margin-bottom:12px; }
+.barLabel{ font-size:14px; margin-bottom:4px; }
+.barContainer{ background:#222; height:16px; width:100%; }
+.barFill{ height:100%; transition:width 1s ease; }
 
 /* VIP PANEL */
-#vipPanel {
-    font-size:20px;
-    transition: opacity 0.6s ease;
-}
+#vipPanel{ transition:opacity 0.6s ease; }
+.hidden{ opacity:0; pointer-events:none; }
 
-.hidden { opacity:0; pointer-events:none; }
-
-/* CD IDLE */
-#cdIdle {
+/* CD */
+#cdIdle{
     display:flex;
     justify-content:center;
     align-items:center;
     height:100%;
-    transition: opacity 0.6s ease;
+    transition:opacity 0.6s ease;
 }
 
-.cd {
-    width:300px;
-    height:300px;
+.cd{
+    width:280px;
+    height:280px;
     border-radius:50%;
     background:
-        radial-gradient(circle at center, #111 0%, #222 25%, #ccc 40%, #eee 50%, #ccc 60%, #222 75%, #111 100%);
+        radial-gradient(circle at center,#111 0%,#222 25%,#ccc 40%,#eee 50%,#ccc 60%,#222 75%,#111 100%);
     position:relative;
-    animation: spin 4s linear infinite;
-    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00f7ff;
+    animation:spin 4s linear infinite;
+    box-shadow:0 0 20px #ff00ff,0 0 40px #00f7ff;
 }
-
-.cd::after {
+.cd::after{
     content:"";
     position:absolute;
     top:50%;
@@ -100,89 +93,87 @@ body {
     border-radius:50%;
     background:#111;
 }
-
-.cd::before {
+.cd::before{
     content:"";
     position:absolute;
     width:100%;
     height:100%;
     border-radius:50%;
-    background:linear-gradient(120deg, transparent 30%, rgba(0,255,255,0.4) 45%, transparent 60%);
-    animation: sweep 3s linear infinite;
+    background:linear-gradient(120deg,transparent 30%,rgba(0,255,255,0.4) 45%,transparent 60%);
+    animation:sweep 3s linear infinite;
 }
+@keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+@keyframes sweep{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
-@keyframes spin { from {transform:rotate(0deg);} to {transform:rotate(360deg);} }
-@keyframes sweep { from {transform:rotate(0deg);} to {transform:rotate(360deg);} }
-
-/* PHOTO GRID */
-#photos {
+/* SPOTLIGHT */
+#spotlightPanel{
     position:absolute;
-    bottom:120px;
-    left:460px;
-    right:460px;
-    display:grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap:30px;
-}
-
-.polaroid {
-    background:white;
-    color:black;
-    padding:12px;
-    text-align:center;
-    box-shadow: 0 0 10px #ff00ff, 0 0 25px #ff00ff;
-}
-
-.polaroid img {
-    width:100%;
-    height:300px;
-    object-fit:contain;
-    background:black;
-}
-
-.name { font-family:'Audiowide'; font-size:16px; margin-top:6px; }
-.real { font-size:14px; }
-
-/* SPOTLIGHT PANEL */
-#spotlightPanel {
-    position:absolute;
-    top:320px;
+    top:240px;
     left:50%;
     transform:translateX(-50%);
     width:900px;
     text-align:center;
-    opacity:1;
-    transition: opacity 0.6s ease;
+    transition:opacity 0.6s ease;
 }
-
-.spotlightTitle {
+.spotlightTitle{
     font-family:'Audiowide';
     font-size:22px;
     margin-bottom:6px;
 }
-
-.spotlightUnderline {
+.spotlightUnderline{
     width:0;
     height:3px;
     margin:6px auto 12px auto;
     background:linear-gradient(90deg,#00f7ff,#ff00ff);
-    animation: underline 1.2s ease forwards;
+    animation:underline 1.2s ease forwards;
+}
+@keyframes underline{
+    from{width:0;}
+    to{width:60%;}
+}
+.glowPulse{
+    animation:pulse 1s ease;
+}
+@keyframes pulse{
+    0%{text-shadow:0 0 10px #00f7ff;}
+    50%{text-shadow:0 0 40px #ff00ff;}
+    100%{text-shadow:0 0 10px #00f7ff;}
 }
 
-@keyframes underline {
-    from { width:0; }
-    to { width:60%; }
+/* PHOTO WALL */
+#photos{
+    position:absolute;
+    top:400px;
+    left:0;
+    right:0;
+    bottom:0;
+    padding:40px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:40px;
 }
 
-.glowPulse {
-    animation: pulse 1s ease;
+.polaroid{
+    background:white;
+    color:black;
+    padding:14px;
+    text-align:center;
+    box-shadow:0 0 15px #ff00ff,0 0 30px #ff00ff;
 }
 
-@keyframes pulse {
-    0% { text-shadow:0 0 10px #00f7ff; }
-    50% { text-shadow:0 0 40px #ff00ff; }
-    100% { text-shadow:0 0 10px #00f7ff; }
+.polaroid img{
+    width:100%;
+    height:420px;
+    object-fit:contain;
+    background:black;
 }
+
+.name{
+    font-family:'Audiowide';
+    font-size:16px;
+    margin-top:6px;
+}
+.real{ font-size:14px; }
 </style>
 </head>
 <body>
@@ -190,13 +181,11 @@ body {
 <div id="header">DJ NEON'S MILLENNIUM COUNTDOWN</div>
 <div id="countdown"></div>
 
-<!-- LEFT -->
 <div id="leftPanel">
     <div class="monitorTitle">Y2K SYSTEM STABILITY</div>
     <div id="monitorBars"></div>
 </div>
 
-<!-- RIGHT -->
 <div id="rightPanel">
     <div id="vipPanel"></div>
     <div id="cdIdle" class="hidden">
@@ -204,57 +193,51 @@ body {
     </div>
 </div>
 
-<!-- SPOTLIGHT -->
 <div id="spotlightPanel"></div>
-
-<!-- PHOTOS -->
 <div id="photos"></div>
 
 <script>
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2-PvhqluJKo9Fg8Oxx9t5GlTvA9zv8bUm1DVHVnlc_4R2T2Jdtip1hmUVJvHI6Ik6T69VT_Bn270R/pub?output=csv";
-const totalGuests = 20;
+const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vR2-PvhqluJKo9Fg8Oxx9t5GlTvA9zv8bUm1DVHVnlc_4R2T2Jdtip1hmUVJvHI6Ik6T69VT_Bn270R/pub?output=csv";
+const totalGuests=20;
 
-let lastCheckInTime = Date.now();
-let idleMode = false;
-const idleLimit = 5 * 60 * 1000;
-
-let spotlightIndex = 0;
-let spotlightGuests = [];
+let lastCheckInTime=Date.now();
+let idleMode=false;
+const idleLimit=5*60*1000;
+let spotlightIndex=0;
+let spotlightGuests=[];
 
 /* COUNTDOWN */
 function updateCountdown(){
-    const now = new Date();
-    const target = new Date();
-    target.setHours(22);
-    target.setMinutes(0);
-    target.setSeconds(0);
-    const diff = target - now;
-    if(diff <= 0) return;
-    const hrs = Math.floor(diff/1000/60/60);
-    const mins = Math.floor(diff/1000/60)%60;
-    const secs = Math.floor(diff/1000)%60;
-    document.getElementById("countdown").innerText =
-        String(hrs).padStart(2,"0")+":"+
-        String(mins).padStart(2,"0")+":"+
-        String(secs).padStart(2,"0");
+    const now=new Date();
+    const target=new Date();
+    target.setHours(22,0,0,0);
+    const diff=target-now;
+    if(diff<=0)return;
+    const h=Math.floor(diff/1000/60/60);
+    const m=Math.floor(diff/1000/60)%60;
+    const s=Math.floor(diff/1000)%60;
+    document.getElementById("countdown").innerText=
+        String(h).padStart(2,"0")+":"+
+        String(m).padStart(2,"0")+":"+
+        String(s).padStart(2,"0");
 }
 setInterval(updateCountdown,1000);
 updateCountdown();
 
 /* MONITOR */
-const systems = ["POWER GRID","BANK SERVERS","AIR TRAFFIC","INTERNET BACKBONE"];
+const systems=["POWER GRID","BANK SERVERS","AIR TRAFFIC","INTERNET BACKBONE"];
 function updateMonitor(){
-    const container = document.getElementById("monitorBars");
-    container.innerHTML="";
+    const c=document.getElementById("monitorBars");
+    c.innerHTML="";
     systems.forEach(sys=>{
-        const value = Math.floor(Math.random()*40)+60;
-        container.innerHTML += `
-            <div class="barRow">
-                <div class="barLabel">${sys} – ${value}%</div>
-                <div class="barContainer">
-                    <div class="barFill" style="width:${value}%; background:${value<75?'#ff4444':'#00ff88'}"></div>
-                </div>
-            </div>`;
+        const v=Math.floor(Math.random()*40)+60;
+        c.innerHTML+=`
+        <div class="barRow">
+            <div class="barLabel">${sys} – ${v}%</div>
+            <div class="barContainer">
+                <div class="barFill" style="width:${v}%;background:${v<75?'#ff4444':'#00ff88'}"></div>
+            </div>
+        </div>`;
     });
 }
 setInterval(updateMonitor,5000);
@@ -264,99 +247,87 @@ updateMonitor();
 function switchToIdle(){
     document.getElementById("vipPanel").classList.add("hidden");
     document.getElementById("cdIdle").classList.remove("hidden");
-    idleMode = true;
+    idleMode=true;
 }
 function switchToVIP(){
     document.getElementById("cdIdle").classList.add("hidden");
     document.getElementById("vipPanel").classList.remove("hidden");
-    idleMode = false;
+    idleMode=false;
 }
 setInterval(()=>{
-    if(Date.now() - lastCheckInTime > idleLimit){
-        if(!idleMode) switchToIdle();
+    if(Date.now()-lastCheckInTime>idleLimit){
+        if(!idleMode)switchToIdle();
     }
 },10000);
 
 /* CSV */
 function parseCSV(text){
-    return text.trim().split("\n").map(row =>
-        row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    ).map(r => r.map(c => c.replace(/^"|"$/g,'')));
+    return text.trim().split("\n").map(r=>
+        r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+    ).map(r=>r.map(c=>c.replace(/^"|"$/g,'')));
 }
 
-/* SPOTLIGHT ROTATION */
+/* SPOTLIGHT */
 function rotateSpotlight(){
-    if(spotlightGuests.length === 0) return;
-
-    const g = spotlightGuests[spotlightIndex % spotlightGuests.length];
-
-    const panel = document.getElementById("spotlightPanel");
-    panel.style.opacity = 0;
-
+    if(spotlightGuests.length===0)return;
+    const g=spotlightGuests[spotlightIndex%spotlightGuests.length];
+    const panel=document.getElementById("spotlightPanel");
+    panel.style.opacity=0;
     setTimeout(()=>{
-        panel.innerHTML = `
-            <div class="spotlightTitle glowPulse">🔦 CLUB SPOTLIGHT</div>
-            <div class="spotlightUnderline"></div>
-            ${g.name} (${g.real}) – ${g.title}<br>
-            "${g.desc}"
-        `;
-        panel.style.opacity = 1;
+        panel.innerHTML=`
+        <div class="spotlightTitle glowPulse">🔦 CLUB SPOTLIGHT</div>
+        <div class="spotlightUnderline"></div>
+        ${g.name} (${g.real}) – ${g.title}<br>
+        "${g.desc}"`;
+        panel.style.opacity=1;
     },400);
-
     spotlightIndex++;
 }
 setInterval(rotateSpotlight,8000);
 
 /* LOAD SHEET */
 async function loadSheet(){
-    const response = await fetch(sheetURL);
-    const text = await response.text();
-    const rows = parseCSV(text);
-
-    const container = document.getElementById("photos");
-    spotlightGuests = [];
-
-    let count = 0;
-    let lastArrival = "";
+    const response=await fetch(sheetURL);
+    const text=await response.text();
+    const rows=parseCSV(text);
+    const container=document.getElementById("photos");
+    spotlightGuests=[];
+    let count=0;
+    let lastArrival="";
 
     for(let i=1;i<rows.length;i++){
-        const row = rows[i];
-        if(row.length < 5) continue;
+        const row=rows[i];
+        if(row.length<5)continue;
+        const character=row[0];
+        const title=row[1];
+        const desc=row[2];
+        const real=row[3];
+        const photoFile=row[4];
 
-        const character = row[0];
-        const title = row[1];
-        const desc = row[2];
-        const real = row[3];
-        const photoFile = row[4];
-
-        if(real && photoFile){
+        if(real&&photoFile){
             count++;
-            lastArrival = character + " (" + real + ")";
-
+            lastArrival=character+" ("+real+")";
             spotlightGuests.push({name:character,title:title,desc:desc,real:real});
-
             if(!document.getElementById(character)){
-                const div = document.createElement("div");
+                const div=document.createElement("div");
                 div.className="polaroid";
-                div.id = character;
-                div.innerHTML = `
-                    <img src="photos/${photoFile}">
-                    <div class="name">${character}</div>
-                    <div class="real">${real}</div>
-                `;
+                div.id=character;
+                div.innerHTML=`
+                <img src="photos/${photoFile}">
+                <div class="name">${character}</div>
+                <div class="real">${real}</div>`;
                 container.appendChild(div);
-                lastCheckInTime = Date.now();
-                if(idleMode) switchToVIP();
+                lastCheckInTime=Date.now();
+                if(idleMode)switchToVIP();
             }
         }
     }
 
-    document.getElementById("vipPanel").innerHTML = `
+    document.getElementById("vipPanel").innerHTML=`
         <div style="font-family:'Audiowide';margin-bottom:10px;">VIP CHECK-IN</div>
         ${count} / ${totalGuests} Guests<br><br>
         <div style="font-size:16px;">LAST ARRIVAL</div>
-        ${lastArrival}
-    `;
+        ${lastArrival}`;
 }
 
 setInterval(loadSheet,15000);
