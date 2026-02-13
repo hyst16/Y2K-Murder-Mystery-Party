@@ -9,37 +9,37 @@
 <style>
 body {
     margin:0;
-    background:#060816;
+    background:#050816;
     color:white;
     font-family:sans-serif;
     overflow:hidden;
 }
 
+/* HEADER */
 #header {
     text-align:center;
     font-family:'Audiowide';
-    font-size:28px;
-    padding-top:15px;
+    font-size:42px;
+    padding-top:20px;
     color:#00f7ff;
-    text-shadow:0 0 15px #00f7ff;
+    text-shadow:0 0 25px #00f7ff;
 }
 
+/* MASSIVE COUNTDOWN */
 #countdown {
     text-align:center;
     font-family:'Orbitron';
-    font-size:90px;
-    margin-top:20px;
-    background: linear-gradient(to bottom, #fff, #aaa);
+    font-size:160px;
+    margin-top:10px;
+    background: linear-gradient(to bottom, #ffffff, #bbbbbb);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow:0 0 30px #ff00ff;
+    text-shadow:0 0 60px #ff00ff;
 }
 
+/* Equalizer */
 #equalizer {
-    position:absolute;
-    top:180px;
-    width:100%;
-    height:120px;
+    margin-top:10px;
     display:flex;
     justify-content:center;
     gap:6px;
@@ -47,6 +47,7 @@ body {
 
 .bar {
     width:8px;
+    height:60px;
     background:#00f7ff;
     animation: bounce 1s infinite ease-in-out;
 }
@@ -56,47 +57,81 @@ body {
     50% {height:100px;}
 }
 
+/* PHOTO GRID */
 #photos {
     position:absolute;
-    bottom:120px;
+    bottom:110px;
     width:100%;
     display:grid;
     grid-template-columns: repeat(10, 1fr);
-    gap:10px;
-    padding:20px;
+    gap:30px;
+    padding:40px;
+    box-sizing:border-box;
 }
 
+/* POLAROID CARD */
 .polaroid {
     background:white;
     color:black;
-    padding:8px;
-    box-shadow:0 0 15px #ff00ff;
-    transform:rotate(calc(-3deg + 6deg * var(--rand)));
+    padding:12px;
+    text-align:center;
+    opacity:0;
+    transform: translateY(40px);
+    transition: all 0.8s ease;
 }
 
+/* Neon Glow Border */
+.polaroid {
+    box-shadow:
+        0 0 10px #ff00ff,
+        0 0 25px #ff00ff,
+        0 0 50px #ff00ff;
+}
+
+/* Slide-in Activated */
+.polaroid.show {
+    opacity:1;
+    transform: translateY(0);
+}
+
+/* Floating Animation */
+.polaroid.float {
+    animation: float 6s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(var(--tilt)); }
+    100% { transform: translateY(-8px) rotate(var(--tilt)); }
+}
+
+/* Portrait Friendly */
 .polaroid img {
     width:100%;
-    height:120px;
-    object-fit:cover;
+    height:320px;
+    object-fit:contain;
+    background:black;
 }
 
 .name {
     font-family:'Audiowide';
-    font-size:12px;
+    font-size:16px;
+    margin-top:6px;
 }
 
 .real {
-    font-size:11px;
+    font-size:14px;
 }
 
+/* Spotlight */
 #spotlight {
     position:absolute;
-    bottom:60px;
-    left:20px;
-    font-size:16px;
-    max-width:500px;
+    left:40px;
+    bottom:40px;
+    font-size:20px;
+    max-width:600px;
 }
 
+/* Ticker */
 #ticker {
     position:absolute;
     bottom:0;
@@ -129,7 +164,7 @@ body {
     justify-content:center;
     align-items:center;
     font-family:'Orbitron';
-    font-size:60px;
+    font-size:80px;
     color:#00ffcc;
 }
 </style>
@@ -138,7 +173,6 @@ body {
 
 <div id="header">DJ NEON'S MILLENNIUM COUNTDOWN</div>
 <div id="countdown"></div>
-
 <div id="equalizer"></div>
 <div id="photos"></div>
 <div id="spotlight"></div>
@@ -157,6 +191,7 @@ const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2-PvhqluJKo9
 const targetHour = 22;
 const targetMinute = 0;
 
+/* Countdown */
 function updateCountdown(){
     const now = new Date();
     const target = new Date();
@@ -180,10 +215,10 @@ function updateCountdown(){
         String(mins).padStart(2,"0")+":"+
         String(secs).padStart(2,"0");
 }
-
 setInterval(updateCountdown,1000);
 updateCountdown();
 
+/* Equalizer */
 for(let i=0;i<40;i++){
     const bar = document.createElement("div");
     bar.className="bar";
@@ -191,20 +226,11 @@ for(let i=0;i<40;i++){
     document.getElementById("equalizer").appendChild(bar);
 }
 
-function cleanText(text){
-    return text
-        .replace(/â€™/g,"'")
-        .replace(/â€œ/g,'"')
-        .replace(/â€/g,'"')
-        .replace(/Â/g,"")
-        .trim();
-}
-
+/* CSV Parsing */
 function parseCSV(text){
-    const rows = text.trim().split("\n").map(row =>
+    return text.trim().split("\n").map(row =>
         row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    );
-    return rows.map(r => r.map(c => cleanText(c.replace(/^"|"$/g,''))));
+    ).map(r => r.map(c => c.replace(/^"|"$/g,'')));
 }
 
 let spotlightIndex = 0;
@@ -212,17 +238,13 @@ let spotlightGuests = [];
 
 function rotateSpotlight(){
     if(spotlightGuests.length === 0) return;
-
     const g = spotlightGuests[spotlightIndex % spotlightGuests.length];
-
     document.getElementById("spotlight").innerHTML =
         "<b>🔦 CLUB SPOTLIGHT</b><br>"+
         g.name+" – "+g.title+"<br>"+
         "\""+g.desc+"\"";
-
     spotlightIndex++;
 }
-
 setInterval(rotateSpotlight,8000);
 
 async function loadSheet(){
@@ -231,9 +253,6 @@ async function loadSheet(){
     const rows = parseCSV(text);
 
     const container = document.getElementById("photos");
-    container.innerHTML = "";
-
-    spotlightGuests = [];
 
     for(let i=1;i<rows.length;i++){
         const row = rows[i];
@@ -246,31 +265,45 @@ async function loadSheet(){
         const photoFile = row[4];
 
         if(real && photoFile){
+            if(document.getElementById(character)) continue;
+
             const div = document.createElement("div");
             div.className="polaroid";
-            div.style.setProperty('--rand', Math.random());
+            div.id = character;
 
-            const img = document.createElement("img");
+            const randomTilt = (Math.random()*6 - 3) + "deg";
+            div.style.setProperty('--tilt', randomTilt);
+            div.style.transform = "rotate(" + randomTilt + ")";
+
+            const img = new Image();
             img.src = "photos/" + photoFile;
-            div.appendChild(img);
 
-            const name = document.createElement("div");
-            name.className="name";
-            name.innerText = character;
-            div.appendChild(name);
+            img.onload = function(){
+                div.appendChild(img);
 
-            const realDiv = document.createElement("div");
-            realDiv.className="real";
-            realDiv.innerText = real;
-            div.appendChild(realDiv);
+                const name = document.createElement("div");
+                name.className="name";
+                name.innerText = character;
+                div.appendChild(name);
 
-            container.appendChild(div);
+                const realDiv = document.createElement("div");
+                realDiv.className="real";
+                realDiv.innerText = real;
+                div.appendChild(realDiv);
 
-            spotlightGuests.push({
-                name: character,
-                title: title,
-                desc: desc
-            });
+                container.appendChild(div);
+
+                setTimeout(()=>{
+                    div.classList.add("show");
+                    div.classList.add("float");
+                },50);
+
+                spotlightGuests.push({
+                    name: character,
+                    title: title,
+                    desc: desc
+                });
+            };
         }
     }
 }
@@ -278,8 +311,6 @@ async function loadSheet(){
 setInterval(loadSheet,15000);
 loadSheet();
 </script>
-
-
 
 </body>
 </html>
