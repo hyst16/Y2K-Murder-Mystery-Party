@@ -42,8 +42,8 @@
         /* ============= TOP BAND (260px) ============= */
         .top-band {
             display: grid;
-            grid-template-columns: 280px 1fr 300px;
-            gap: 20px;
+            grid-template-columns: 320px 1fr 320px;
+            gap: 30px;
             padding: 20px;
             background: linear-gradient(180deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 10, 58, 0.9) 100%);
             border-bottom: 2px solid var(--cyan);
@@ -370,7 +370,7 @@
             flex: 1;
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            grid-auto-rows: 410px;
+            grid-auto-rows: auto;
             gap: 20px;
             padding: 30px;
             align-content: start;
@@ -381,75 +381,78 @@
         .guest-card {
             display: flex;
             flex-direction: column;
-            background: rgba(10, 14, 39, 0.6);
-            border: 2px solid var(--cyan);
-            border-radius: 4px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-            transition: box-shadow 0.3s ease;
+            background: #f5f5f0;
+            border: 8px solid #f5f5f0;
+            border-bottom: 35px solid #f5f5f0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.15);
+            overflow: visible;
             animation: card-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             cursor: default;
+            transform: perspective(1000px) rotateZ(-1deg);
+            position: relative;
+        }
+
+        .guest-card.pulse {
+            animation: card-pulse-glow 1.2s ease-out forwards;
+        }
+
+        @keyframes card-pulse-glow {
+            0% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 16, 240, 0.6);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 16, 240, 0.9);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.15);
+            }
         }
 
         @keyframes card-slide-in {
             from {
                 opacity: 0;
-                transform: translateY(40px);
+                transform: perspective(1000px) rotateZ(-1deg) translateY(40px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .guest-card.pulse {
-            animation: card-pulse 1.2s ease-out forwards;
-        }
-
-        @keyframes card-pulse {
-            0% {
-                box-shadow: 0 0 20px rgba(255, 16, 240, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(255, 16, 240, 0.8);
-            }
-            100% {
-                box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+                transform: perspective(1000px) rotateZ(-1deg) translateY(0);
             }
         }
 
         .guest-image {
             width: 100%;
-            height: 280px;
-            object-fit: cover;
-            background: rgba(0, 0, 0, 0.4);
+            height: auto;
+            object-fit: contain;
+            background: #000;
+            display: block;
         }
 
         .guest-info {
-            flex: 1;
-            padding: 12px;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(26, 10, 58, 0.5) 100%);
+            padding: 12px 8px;
+            background: #f5f5f0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-end;
+            gap: 2px;
+            text-align: center;
+            min-height: 40px;
         }
 
         .guest-character {
             font-family: 'Orbitron', monospace;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
             line-height: 1.2;
+            text-shadow: none;
         }
 
         .guest-real-name {
-            font-size: 10px;
-            color: var(--cyan);
-            text-shadow: 0 0 8px var(--cyan);
+            font-size: 9px;
+            color: #333;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         /* ============= UTILITIES ============= */
