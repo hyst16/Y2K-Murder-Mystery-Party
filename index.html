@@ -25,7 +25,7 @@ body {
     text-shadow:0 0 25px #00f7ff;
 }
 
-/* MASSIVE COUNTDOWN */
+/* COUNTDOWN */
 #countdown {
     text-align:center;
     font-family:'Orbitron';
@@ -37,135 +37,151 @@ body {
     text-shadow:0 0 60px #ff00ff;
 }
 
-/* Equalizer */
-#equalizer {
-    margin-top:10px;
+/* PANELS */
+#leftPanel, #rightPanel {
+    position:absolute;
+    bottom:120px;
+    width:380px;
+    height:420px;
+    padding:20px;
+    box-sizing:border-box;
+}
+
+#leftPanel { left:40px; }
+#rightPanel { right:40px; }
+
+/* STABILITY MONITOR */
+.monitorTitle {
+    font-family:'Audiowide';
+    margin-bottom:15px;
+}
+
+.barRow { margin-bottom:15px; }
+.barLabel { font-size:14px; margin-bottom:4px; }
+.barContainer { background:#222; height:18px; width:100%; }
+.barFill { height:100%; transition: width 1s ease; }
+
+/* VIP PANEL */
+#vipPanel {
+    font-size:20px;
+    transition: opacity 0.6s ease;
+}
+
+.hidden { opacity:0; pointer-events:none; }
+
+/* CD IDLE */
+#cdIdle {
     display:flex;
     justify-content:center;
-    gap:6px;
+    align-items:center;
+    height:100%;
+    transition: opacity 0.6s ease;
 }
 
-.bar {
-    width:8px;
+.cd {
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    background:
+        radial-gradient(circle at center, #111 0%, #222 25%, #ccc 40%, #eee 50%, #ccc 60%, #222 75%, #111 100%);
+    position:relative;
+    animation: spin 4s linear infinite;
+    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00f7ff;
+}
+
+.cd::after {
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:60px;
     height:60px;
-    background:#00f7ff;
-    animation: bounce 1s infinite ease-in-out;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:#111;
 }
 
-@keyframes bounce {
-    0%,100% {height:20px;}
-    50% {height:100px;}
+.cd::before {
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    background:linear-gradient(120deg, transparent 30%, rgba(0,255,255,0.4) 45%, transparent 60%);
+    animation: sweep 3s linear infinite;
 }
+
+@keyframes spin { from {transform:rotate(0deg);} to {transform:rotate(360deg);} }
+@keyframes sweep { from {transform:rotate(0deg);} to {transform:rotate(360deg);} }
 
 /* PHOTO GRID */
 #photos {
     position:absolute;
-    bottom:110px;
-    width:100%;
+    bottom:120px;
+    left:460px;
+    right:460px;
     display:grid;
     grid-template-columns: repeat(10, 1fr);
     gap:30px;
-    padding:40px;
-    box-sizing:border-box;
 }
 
-/* POLAROID CARD */
 .polaroid {
     background:white;
     color:black;
     padding:12px;
     text-align:center;
-    opacity:0;
-    transform: translateY(40px);
-    transition: all 0.8s ease;
+    box-shadow: 0 0 10px #ff00ff, 0 0 25px #ff00ff;
 }
 
-/* Neon Glow Border */
-.polaroid {
-    box-shadow:
-        0 0 10px #ff00ff,
-        0 0 25px #ff00ff,
-        0 0 50px #ff00ff;
-}
-
-/* Slide-in Activated */
-.polaroid.show {
-    opacity:1;
-    transform: translateY(0);
-}
-
-/* Floating Animation */
-.polaroid.float {
-    animation: float 6s ease-in-out infinite alternate;
-}
-
-@keyframes float {
-    0% { transform: translateY(0px) rotate(var(--tilt)); }
-    100% { transform: translateY(-8px) rotate(var(--tilt)); }
-}
-
-/* Portrait Friendly */
 .polaroid img {
     width:100%;
-    height:320px;
+    height:300px;
     object-fit:contain;
     background:black;
 }
 
-.name {
+.name { font-family:'Audiowide'; font-size:16px; margin-top:6px; }
+.real { font-size:14px; }
+
+/* SPOTLIGHT PANEL */
+#spotlightPanel {
+    position:absolute;
+    top:320px;
+    left:50%;
+    transform:translateX(-50%);
+    width:900px;
+    text-align:center;
+    opacity:1;
+    transition: opacity 0.6s ease;
+}
+
+.spotlightTitle {
     font-family:'Audiowide';
-    font-size:16px;
-    margin-top:6px;
+    font-size:22px;
+    margin-bottom:6px;
 }
 
-.real {
-    font-size:14px;
+.spotlightUnderline {
+    width:0;
+    height:3px;
+    margin:6px auto 12px auto;
+    background:linear-gradient(90deg,#00f7ff,#ff00ff);
+    animation: underline 1.2s ease forwards;
 }
 
-/* Spotlight */
-#spotlight {
-    position:absolute;
-    left:40px;
-    bottom:40px;
-    font-size:20px;
-    max-width:600px;
+@keyframes underline {
+    from { width:0; }
+    to { width:60%; }
 }
 
-/* Ticker */
-#ticker {
-    position:absolute;
-    bottom:0;
-    width:100%;
-    background:black;
-    color:#00ff88;
-    white-space:nowrap;
-    overflow:hidden;
+.glowPulse {
+    animation: pulse 1s ease;
 }
 
-#ticker span {
-    display:inline-block;
-    padding-left:100%;
-    animation: ticker 20s linear infinite;
-}
-
-@keyframes ticker {
-    0% {transform:translateX(0);}
-    100% {transform:translateX(-100%);}
-}
-
-#y2k {
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:black;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    font-family:'Orbitron';
-    font-size:80px;
-    color:#00ffcc;
+@keyframes pulse {
+    0% { text-shadow:0 0 10px #00f7ff; }
+    50% { text-shadow:0 0 40px #ff00ff; }
+    100% { text-shadow:0 0 10px #00f7ff; }
 }
 </style>
 </head>
@@ -173,43 +189,50 @@ body {
 
 <div id="header">DJ NEON'S MILLENNIUM COUNTDOWN</div>
 <div id="countdown"></div>
-<div id="equalizer"></div>
-<div id="photos"></div>
-<div id="spotlight"></div>
 
-<div id="ticker">
-    <span>
-        MusicNetHub ▲ 32% | Sterling Soundscapes ▼ 12% | Napster Lawsuit Pending | Y2K Bug Risk: CRITICAL | ARE WE READY?
-    </span>
+<!-- LEFT -->
+<div id="leftPanel">
+    <div class="monitorTitle">Y2K SYSTEM STABILITY</div>
+    <div id="monitorBars"></div>
 </div>
 
-<div id="y2k">WELCOME TO 2000</div>
+<!-- RIGHT -->
+<div id="rightPanel">
+    <div id="vipPanel"></div>
+    <div id="cdIdle" class="hidden">
+        <div class="cd"></div>
+    </div>
+</div>
+
+<!-- SPOTLIGHT -->
+<div id="spotlightPanel"></div>
+
+<!-- PHOTOS -->
+<div id="photos"></div>
 
 <script>
 const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2-PvhqluJKo9Fg8Oxx9t5GlTvA9zv8bUm1DVHVnlc_4R2T2Jdtip1hmUVJvHI6Ik6T69VT_Bn270R/pub?output=csv";
+const totalGuests = 20;
 
-const targetHour = 22;
-const targetMinute = 0;
+let lastCheckInTime = Date.now();
+let idleMode = false;
+const idleLimit = 5 * 60 * 1000;
 
-/* Countdown */
+let spotlightIndex = 0;
+let spotlightGuests = [];
+
+/* COUNTDOWN */
 function updateCountdown(){
     const now = new Date();
     const target = new Date();
-    target.setHours(targetHour);
-    target.setMinutes(targetMinute);
+    target.setHours(22);
+    target.setMinutes(0);
     target.setSeconds(0);
-
     const diff = target - now;
-
-    if(diff <= 0){
-        document.getElementById("y2k").style.display="flex";
-        return;
-    }
-
+    if(diff <= 0) return;
     const hrs = Math.floor(diff/1000/60/60);
     const mins = Math.floor(diff/1000/60)%60;
     const secs = Math.floor(diff/1000)%60;
-
     document.getElementById("countdown").innerText =
         String(hrs).padStart(2,"0")+":"+
         String(mins).padStart(2,"0")+":"+
@@ -218,41 +241,83 @@ function updateCountdown(){
 setInterval(updateCountdown,1000);
 updateCountdown();
 
-/* Equalizer */
-for(let i=0;i<40;i++){
-    const bar = document.createElement("div");
-    bar.className="bar";
-    bar.style.animationDelay = (Math.random()*1)+"s";
-    document.getElementById("equalizer").appendChild(bar);
+/* MONITOR */
+const systems = ["POWER GRID","BANK SERVERS","AIR TRAFFIC","INTERNET BACKBONE"];
+function updateMonitor(){
+    const container = document.getElementById("monitorBars");
+    container.innerHTML="";
+    systems.forEach(sys=>{
+        const value = Math.floor(Math.random()*40)+60;
+        container.innerHTML += `
+            <div class="barRow">
+                <div class="barLabel">${sys} – ${value}%</div>
+                <div class="barContainer">
+                    <div class="barFill" style="width:${value}%; background:${value<75?'#ff4444':'#00ff88'}"></div>
+                </div>
+            </div>`;
+    });
 }
+setInterval(updateMonitor,5000);
+updateMonitor();
 
-/* CSV Parsing */
+/* IDLE SWITCH */
+function switchToIdle(){
+    document.getElementById("vipPanel").classList.add("hidden");
+    document.getElementById("cdIdle").classList.remove("hidden");
+    idleMode = true;
+}
+function switchToVIP(){
+    document.getElementById("cdIdle").classList.add("hidden");
+    document.getElementById("vipPanel").classList.remove("hidden");
+    idleMode = false;
+}
+setInterval(()=>{
+    if(Date.now() - lastCheckInTime > idleLimit){
+        if(!idleMode) switchToIdle();
+    }
+},10000);
+
+/* CSV */
 function parseCSV(text){
     return text.trim().split("\n").map(row =>
         row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
     ).map(r => r.map(c => c.replace(/^"|"$/g,'')));
 }
 
-let spotlightIndex = 0;
-let spotlightGuests = [];
-
+/* SPOTLIGHT ROTATION */
 function rotateSpotlight(){
     if(spotlightGuests.length === 0) return;
+
     const g = spotlightGuests[spotlightIndex % spotlightGuests.length];
-    document.getElementById("spotlight").innerHTML =
-        "<b>🔦 CLUB SPOTLIGHT</b><br>"+
-        g.name+" – "+g.title+"<br>"+
-        "\""+g.desc+"\"";
+
+    const panel = document.getElementById("spotlightPanel");
+    panel.style.opacity = 0;
+
+    setTimeout(()=>{
+        panel.innerHTML = `
+            <div class="spotlightTitle glowPulse">🔦 CLUB SPOTLIGHT</div>
+            <div class="spotlightUnderline"></div>
+            ${g.name} (${g.real}) – ${g.title}<br>
+            "${g.desc}"
+        `;
+        panel.style.opacity = 1;
+    },400);
+
     spotlightIndex++;
 }
 setInterval(rotateSpotlight,8000);
 
+/* LOAD SHEET */
 async function loadSheet(){
     const response = await fetch(sheetURL);
     const text = await response.text();
     const rows = parseCSV(text);
 
     const container = document.getElementById("photos");
+    spotlightGuests = [];
+
+    let count = 0;
+    let lastArrival = "";
 
     for(let i=1;i<rows.length;i++){
         const row = rows[i];
@@ -265,47 +330,33 @@ async function loadSheet(){
         const photoFile = row[4];
 
         if(real && photoFile){
-            if(document.getElementById(character)) continue;
+            count++;
+            lastArrival = character + " (" + real + ")";
 
-            const div = document.createElement("div");
-            div.className="polaroid";
-            div.id = character;
+            spotlightGuests.push({name:character,title:title,desc:desc,real:real});
 
-            const randomTilt = (Math.random()*6 - 3) + "deg";
-            div.style.setProperty('--tilt', randomTilt);
-            div.style.transform = "rotate(" + randomTilt + ")";
-
-            const img = new Image();
-            img.src = "photos/" + photoFile;
-
-            img.onload = function(){
-                div.appendChild(img);
-
-                const name = document.createElement("div");
-                name.className="name";
-                name.innerText = character;
-                div.appendChild(name);
-
-                const realDiv = document.createElement("div");
-                realDiv.className="real";
-                realDiv.innerText = real;
-                div.appendChild(realDiv);
-
+            if(!document.getElementById(character)){
+                const div = document.createElement("div");
+                div.className="polaroid";
+                div.id = character;
+                div.innerHTML = `
+                    <img src="photos/${photoFile}">
+                    <div class="name">${character}</div>
+                    <div class="real">${real}</div>
+                `;
                 container.appendChild(div);
-
-                setTimeout(()=>{
-                    div.classList.add("show");
-                    div.classList.add("float");
-                },50);
-
-                spotlightGuests.push({
-                    name: character,
-                    title: title,
-                    desc: desc
-                });
-            };
+                lastCheckInTime = Date.now();
+                if(idleMode) switchToVIP();
+            }
         }
     }
+
+    document.getElementById("vipPanel").innerHTML = `
+        <div style="font-family:'Audiowide';margin-bottom:10px;">VIP CHECK-IN</div>
+        ${count} / ${totalGuests} Guests<br><br>
+        <div style="font-size:16px;">LAST ARRIVAL</div>
+        ${lastArrival}
+    `;
 }
 
 setInterval(loadSheet,15000);
