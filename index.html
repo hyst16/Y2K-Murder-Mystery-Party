@@ -197,6 +197,19 @@ function convertDriveLink(url){
     return url;
 }
 
+// Clean weird encoding characters
+function cleanText(text){
+    return text
+        .replace(/â€™/g,"'")
+        .replace(/â€œ/g,'"')
+        .replace(/â€/g,'"')
+        .replace(/â€"/g,'"')
+        .replace(/â€˜/g,"'")
+        .replace(/â€”/g,"—")
+        .replace(/Â/g,"")
+        .trim();
+}
+
 // Proper CSV parser
 function parseCSV(text){
     const rows = [];
@@ -209,7 +222,7 @@ function parseCSV(text){
         if(value.startsWith('"') && value.endsWith('"')){
             value = value.slice(1,-1).replace(/""/g,'"');
         }
-        row.push(value);
+        row.push(cleanText(value));
 
         if(match[3] === "\n"){
             rows.push(row);
@@ -239,7 +252,10 @@ setInterval(rotateSpotlight,8000);
 
 async function loadSheet(){
     const response = await fetch(sheetURL);
-    const text = await response.text();
+    const buffer = await response.arrayBuffer();
+    const decoder = new TextDecoder("utf-8");
+    const text = decoder.decode(buffer);
+
     const rows = parseCSV(text);
 
     const container = document.getElementById("photos");
@@ -290,6 +306,7 @@ async function loadSheet(){
 setInterval(loadSheet,15000);
 loadSheet();
 </script>
+
 
 </body>
 </html>
