@@ -4,314 +4,312 @@
 <meta charset="UTF-8">
 <title>DJ Neon Millennium Countdown</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Audiowide&display=swap" rel="stylesheet">
-
 <style>
 body{
-    margin:0;
-    background:#050816;
-    color:white;
-    font-family:sans-serif;
-    overflow:hidden;
+  margin:0;
+  background:#020617;
+  font-family:Arial, sans-serif;
+  color:white;
+  overflow:hidden;
 }
 
-/* HEADER */
-#header{
-    text-align:center;
-    font-family:'Audiowide';
-    font-size:40px;
-    padding-top:15px;
-    color:#00f7ff;
-    text-shadow:0 0 20px #00f7ff;
+/* ===== TOP BAND ===== */
+.top-band{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:220px;
 }
 
-/* COUNTDOWN */
-#countdown{
-    text-align:center;
-    font-family:'Orbitron';
-    font-size:150px;
-    margin-top:5px;
-    background:linear-gradient(to bottom,#ffffff,#bbbbbb);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    text-shadow:0 0 60px #ff00ff;
+/* LEFT */
+.system{
+  position:absolute;
+  top:20px;
+  left:30px;
+  width:250px;
+  font-size:12px;
+}
+.system h3{ margin-bottom:8px; color:#00ffff; }
+
+.bar{
+  background:#222;
+  height:6px;
+  margin-bottom:10px;
+}
+.bar-fill{
+  height:6px;
+}
+.green{ background:#00ff99; }
+.red{ background:#ff4444; }
+
+/* CENTER */
+.center{
+  text-align:center;
+  margin-top:10px;
 }
 
-/* TOP PANELS */
-#leftPanel,#rightPanel{
-    position:absolute;
-    top:20px;
-    width:360px;
-    padding:20px;
-    box-sizing:border-box;
-}
-#leftPanel{ left:20px; }
-#rightPanel{ right:20px; }
-
-/* STABILITY */
-.monitorTitle{ font-family:'Audiowide'; margin-bottom:15px; }
-.barRow{ margin-bottom:12px; }
-.barLabel{ font-size:14px; margin-bottom:4px; }
-.barContainer{ background:#222; height:16px; width:100%; }
-.barFill{ height:100%; transition:width 1s ease; }
-
-/* VIP PANEL */
-#vipPanel{ transition:opacity 0.6s ease; }
-.hidden{ opacity:0; pointer-events:none; }
-
-/* CD */
-#cdIdle{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100%;
-    transition:opacity 0.6s ease;
-}
-.cd{
-    width:280px;
-    height:280px;
-    border-radius:50%;
-    background:
-        radial-gradient(circle at center,#111 0%,#222 25%,#ccc 40%,#eee 50%,#ccc 60%,#222 75%,#111 100%);
-    position:relative;
-    animation:spin 4s linear infinite;
-    box-shadow:0 0 20px #ff00ff,0 0 40px #00f7ff;
-}
-.cd::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    left:50%;
-    width:60px;
-    height:60px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background:#111;
-}
-.cd::before{
-    content:"";
-    position:absolute;
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    background:linear-gradient(120deg,transparent 30%,rgba(0,255,255,0.4) 45%,transparent 60%);
-    animation:sweep 3s linear infinite;
-}
-@keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-@keyframes sweep{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-
-/* SPOTLIGHT */
-#spotlightPanel{
-    position:absolute;
-    top:240px;
-    left:50%;
-    transform:translateX(-50%);
-    width:900px;
-    text-align:center;
-    transition:opacity 0.6s ease;
+.title{
+  color:#00ffff;
+  font-size:26px;
+  letter-spacing:2px;
 }
 
-/* PHOTO WALL */
-#photos{
-    position:absolute;
-    top:380px;
-    left:0;
-    right:0;
-    bottom:0;
-    padding:40px;
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    align-content:flex-start;
-    gap:40px;
+.countdown{
+  font-size:80px;
+  font-weight:bold;
+  margin:10px 0;
+  color:#ff77ff;
+  text-shadow:0 0 20px #ff00ff;
 }
 
-/* FIXED PHOTO SIZE */
-.polaroid{
-    width:300px;
-    background:white;
-    color:black;
-    padding:14px;
-    text-align:center;
-    box-shadow:0 0 20px #ff00ff,0 0 40px #ff00ff;
+/* Equalizer */
+.equalizer{
+  display:flex;
+  justify-content:center;
+  gap:4px;
+}
+.eq-bar{
+  width:6px;
+  background:#00ffff;
+  animation:wave 1s infinite ease-in-out;
+}
+@keyframes wave{
+  0%{ height:10px; }
+  50%{ height:60px; }
+  100%{ height:10px; }
+}
+
+/* RIGHT */
+.top-right{
+  position:absolute;
+  top:20px;
+  right:30px;
+  width:320px;
+  text-align:right;
+  font-size:14px;
+}
+
+.spotlight{
+  transition:opacity .5s ease;
+}
+
+.ticker{
+  margin-top:10px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.ticker span{
+  display:inline-block;
+  padding-left:100%;
+  animation:ticker 20s linear infinite;
+  color:#00ffcc;
+}
+@keyframes ticker{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-100%); }
+}
+
+/* ===== PHOTO WALL ===== */
+.photo-wall{
+  position:absolute;
+  top:220px;
+  left:0;
+  right:0;
+  bottom:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:40px;
+  padding:0 40px;
+}
+
+.photo-row{
+  display:flex;
+  justify-content:center;
+  gap:30px;
+}
+
+.photo-card{
+  width:180px;
+  height:320px;
+  background:white;
+  border-radius:10px;
+  box-shadow:0 0 20px #ff00ff;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  animation:slideIn .7s ease forwards;
+  opacity:0;
+  transform:translateY(40px);
+}
+
+@keyframes slideIn{
+  to{
     opacity:1;
     transform:translateY(0);
+  }
 }
 
-/* Slide-in animation */
-.polaroid.new{
-    opacity:0;
-    transform:translateY(80px);
-}
-.polaroid.show{
-    transition:all 0.6s ease;
-    opacity:1;
-    transform:translateY(0);
+.photo-card img{
+  width:100%;
+  height:250px;
+  object-fit:cover;
 }
 
-.polaroid img{
-    width:100%;
-    height:420px;
-    object-fit:cover;
-    background:black;
+.photo-card h4{
+  margin:5px 0 0;
+  color:black;
+  font-size:14px;
 }
-
-.name{
-    font-family:'Audiowide';
-    font-size:16px;
-    margin-top:6px;
+.photo-card p{
+  margin:0;
+  font-size:12px;
+  color:black;
 }
-.real{ font-size:14px; }
 </style>
 </head>
+
 <body>
 
-<div id="header">DJ NEON'S MILLENNIUM COUNTDOWN</div>
-<div id="countdown"></div>
+<div class="top-band">
 
-<div id="leftPanel">
-    <div class="monitorTitle">Y2K SYSTEM STABILITY</div>
-    <div id="monitorBars"></div>
-</div>
+  <!-- LEFT -->
+  <div class="system">
+    <h3>Y2K SYSTEM STABILITY</h3>
+    POWER GRID
+    <div class="bar"><div class="bar-fill green" style="width:85%"></div></div>
+    BANK SERVERS
+    <div class="bar"><div class="bar-fill red" style="width:65%"></div></div>
+    AIR TRAFFIC
+    <div class="bar"><div class="bar-fill green" style="width:82%"></div></div>
+    INTERNET BACKBONE
+    <div class="bar"><div class="bar-fill green" style="width:78%"></div></div>
+  </div>
 
-<div id="rightPanel">
-    <div id="vipPanel"></div>
-    <div id="cdIdle" class="hidden">
-        <div class="cd"></div>
+  <!-- CENTER -->
+  <div class="center">
+    <div class="title">DJ NEON'S MILLENNIUM COUNTDOWN</div>
+    <div class="countdown" id="countdown"></div>
+    <div class="equalizer" id="equalizer"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="top-right">
+    <div class="spotlight" id="spotlight"></div>
+    <div class="ticker">
+      <span>MusicNetHub ▲32% | Sterling Soundscapes ▼12% | Napster Lawsuit Pending | Y2K Bug Risk: CRITICAL | ARE WE READY?</span>
     </div>
+  </div>
+
 </div>
 
-<div id="spotlightPanel"></div>
-<div id="photos"></div>
+<div class="photo-wall">
+  <div class="photo-row" id="row1"></div>
+  <div class="photo-row" id="row2"></div>
+</div>
 
 <script>
-const sheetURL="https://docs.google.com/spreadsheets/d/e/2PACX-1vR2-PvhqluJKo9Fg8Oxx9t5GlTvA9zv8bUm1DVHVnlc_4R2T2Jdtip1hmUVJvHI6Ik6T69VT_Bn270R/pub?output=csv";
-const totalGuests=20;
+const sheetURL = "YOUR_GOOGLE_SHEET_CSV_URL_HERE";
+let guests = [];
+let spotlightIndex = 0;
 
-let lastCheckInTime=Date.now();
-let idleMode=false;
-const idleLimit=5*60*1000;
-let spotlightIndex=0;
-let spotlightGuests=[];
-
-/* COUNTDOWN */
+/* ===== COUNTDOWN ===== */
 function updateCountdown(){
-    const now=new Date();
-    const target=new Date();
-    target.setHours(22,0,0,0);
-    const diff=target-now;
-    if(diff<=0)return;
-    const h=Math.floor(diff/1000/60/60);
-    const m=Math.floor(diff/1000/60)%60;
-    const s=Math.floor(diff/1000)%60;
-    document.getElementById("countdown").innerText=
-        String(h).padStart(2,"0")+":"+
-        String(m).padStart(2,"0")+":"+
-        String(s).padStart(2,"0");
+  const target = new Date("January 1, 2026 00:00:00").getTime();
+  const now = new Date().getTime();
+  const diff = target - now;
+
+  const h = Math.floor(diff / (1000*60*60));
+  const m = Math.floor((diff%(1000*60*60))/(1000*60));
+  const s = Math.floor((diff%(1000*60))/1000);
+
+  document.getElementById("countdown").innerText =
+    `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 }
 setInterval(updateCountdown,1000);
 updateCountdown();
 
-/* MONITOR */
-const systems=["POWER GRID","BANK SERVERS","AIR TRAFFIC","INTERNET BACKBONE"];
-function updateMonitor(){
-    const c=document.getElementById("monitorBars");
-    c.innerHTML="";
-    systems.forEach(sys=>{
-        const v=Math.floor(Math.random()*40)+60;
-        c.innerHTML+=`
-        <div class="barRow">
-            <div class="barLabel">${sys} – ${v}%</div>
-            <div class="barContainer">
-                <div class="barFill" style="width:${v}%;background:${v<75?'#ff4444':'#00ff88'}"></div>
-            </div>
-        </div>`;
-    });
-}
-setInterval(updateMonitor,5000);
-updateMonitor();
-
-/* IDLE SWITCH */
-function switchToIdle(){
-    document.getElementById("vipPanel").classList.add("hidden");
-    document.getElementById("cdIdle").classList.remove("hidden");
-    idleMode=true;
-}
-function switchToVIP(){
-    document.getElementById("cdIdle").classList.add("hidden");
-    document.getElementById("vipPanel").classList.remove("hidden");
-    idleMode=false;
-}
-setInterval(()=>{
-    if(Date.now()-lastCheckInTime>idleLimit){
-        if(!idleMode)switchToIdle();
-    }
-},10000);
-
-/* CSV */
-function parseCSV(text){
-    return text.trim().split("\n").map(r=>
-        r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    ).map(r=>r.map(c=>c.replace(/^"|"$/g,'')));
+/* ===== EQUALIZER ===== */
+const eq = document.getElementById("equalizer");
+for(let i=0;i<25;i++){
+  const bar=document.createElement("div");
+  bar.className="eq-bar";
+  bar.style.animationDelay=(i*0.05)+"s";
+  eq.appendChild(bar);
 }
 
-/* LOAD SHEET WITH CACHE BUST */
-async function loadSheet(){
-    const response=await fetch(sheetURL+"&cache="+Date.now());
-    const text=await response.text();
-    const rows=parseCSV(text);
+/* ===== FETCH SHEET ===== */
+async function fetchSheet(){
+  const res = await fetch(sheetURL+"?t="+Date.now());
+  const text = await res.text();
+  const rows = text.split("\n").slice(1);
+  const newGuests = rows.map(r=>{
+    const cols = r.split(",");
+    return {
+      character: cols[0],
+      title: cols[1],
+      description: cols[2],
+      real: cols[3],
+      photo: cols[4]
+    };
+  }).filter(g=>g.photo);
 
-    const container=document.getElementById("photos");
-    spotlightGuests=[];
-    let count=0;
-    let lastArrival="";
+  if(newGuests.length !== guests.length){
+    guests = newGuests;
+    renderPhotos();
+  }
+}
+setInterval(fetchSheet,5000);
+fetchSheet();
 
-    for(let i=1;i<rows.length;i++){
-        const row=rows[i];
-        if(row.length<5)continue;
+/* ===== RENDER PHOTOS ===== */
+function renderPhotos(){
+  const row1=document.getElementById("row1");
+  const row2=document.getElementById("row2");
+  row1.innerHTML="";
+  row2.innerHTML="";
 
-        const character=row[0];
-        const title=row[1];
-        const desc=row[2];
-        const real=row[3];
-        const photoFile=row[4];
+  guests.forEach((g,i)=>{
+    const card=document.createElement("div");
+    card.className="photo-card";
 
-        if(real&&photoFile){
-            count++;
-            lastArrival=character+" ("+real+")";
-            spotlightGuests.push({name:character,title:title,desc:desc,real:real});
+    const img=document.createElement("img");
+    img.src=g.photo+"?t="+Date.now();
 
-            if(!document.getElementById(character)){
-                const div=document.createElement("div");
-                div.className="polaroid new";
-                div.id=character;
-                div.innerHTML=`
-                <img src="photos/${photoFile}">
-                <div class="name">${character}</div>
-                <div class="real">${real}</div>`;
-                container.appendChild(div);
+    const h4=document.createElement("h4");
+    h4.innerText=g.character;
 
-                // Trigger animation
-                setTimeout(()=>{
-                    div.classList.add("show");
-                },50);
+    const p=document.createElement("p");
+    p.innerText=g.real;
 
-                lastCheckInTime=Date.now();
-                if(idleMode)switchToVIP();
-            }
-        }
-    }
+    card.appendChild(img);
+    card.appendChild(h4);
+    card.appendChild(p);
 
-    document.getElementById("vipPanel").innerHTML=`
-        <div style="font-family:'Audiowide';margin-bottom:10px;">VIP CHECK-IN</div>
-        ${count} / ${totalGuests} Guests<br><br>
-        <div style="font-size:16px;">LAST ARRIVAL</div>
-        ${lastArrival}`;
+    if(i<10) row1.appendChild(card);
+    else row2.appendChild(card);
+  });
 }
 
-/* Refresh every 5 seconds */
-setInterval(loadSheet,5000);
-loadSheet();
+/* ===== SPOTLIGHT ROTATION ===== */
+function rotateSpotlight(){
+  if(guests.length===0) return;
+
+  const s=document.getElementById("spotlight");
+  const g=guests[spotlightIndex % guests.length];
+
+  s.style.opacity=0;
+  setTimeout(()=>{
+    s.innerHTML=`<strong>${g.character} (${g.real})</strong><br>${g.title}<br><em>${g.description}</em>`;
+    s.style.opacity=1;
+  },300);
+
+  spotlightIndex++;
+}
+setInterval(rotateSpotlight,10000);
+rotateSpotlight();
 </script>
 
 </body>
