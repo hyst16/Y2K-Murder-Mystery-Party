@@ -191,45 +191,20 @@ for(let i=0;i<40;i++){
     document.getElementById("equalizer").appendChild(bar);
 }
 
-function convertDriveLink(url){
-    const match = url.match(/\/d\/(.*?)\//);
-    if(match) return "https://drive.google.com/uc?export=view&id="+match[1];
-    return url;
-}
-
-// Clean weird encoding characters
 function cleanText(text){
     return text
         .replace(/â€™/g,"'")
         .replace(/â€œ/g,'"')
         .replace(/â€/g,'"')
-        .replace(/â€"/g,'"')
-        .replace(/â€˜/g,"'")
-        .replace(/â€”/g,"—")
         .replace(/Â/g,"")
         .trim();
 }
 
-// Proper CSV parser
 function parseCSV(text){
-    const rows = [];
-    const pattern = /("([^"]|"")*"|[^,\n]*)(,|\n)/g;
-    let row = [];
-    let match;
-
-    while((match = pattern.exec(text))){
-        let value = match[1];
-        if(value.startsWith('"') && value.endsWith('"')){
-            value = value.slice(1,-1).replace(/""/g,'"');
-        }
-        row.push(cleanText(value));
-
-        if(match[3] === "\n"){
-            rows.push(row);
-            row = [];
-        }
-    }
-    return rows;
+    const rows = text.trim().split("\n").map(row =>
+        row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+    );
+    return rows.map(r => r.map(c => cleanText(c.replace(/^"|"$/g,''))));
 }
 
 let spotlightIndex = 0;
@@ -252,10 +227,7 @@ setInterval(rotateSpotlight,8000);
 
 async function loadSheet(){
     const response = await fetch(sheetURL);
-    const buffer = await response.arrayBuffer();
-    const decoder = new TextDecoder("utf-8");
-    const text = decoder.decode(buffer);
-
+    const text = await response.text();
     const rows = parseCSV(text);
 
     const container = document.getElementById("photos");
@@ -271,15 +243,15 @@ async function loadSheet(){
         const title = row[1];
         const desc = row[2];
         const real = row[3];
-        const photo = row[4];
+        const photoFile = row[4];
 
-        if(real && photo){
+        if(real && photoFile){
             const div = document.createElement("div");
             div.className="polaroid";
             div.style.setProperty('--rand', Math.random());
 
             const img = document.createElement("img");
-            img.src = convertDriveLink(photo);
+            img.src = "photos/" + photoFile;
             div.appendChild(img);
 
             const name = document.createElement("div");
@@ -306,6 +278,7 @@ async function loadSheet(){
 setInterval(loadSheet,15000);
 loadSheet();
 </script>
+
 
 
 </body>
