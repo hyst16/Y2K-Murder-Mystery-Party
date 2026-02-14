@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Y2K Murder Mystery Party — Control Room</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -12,16 +12,37 @@
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
 
     :root{
-      --bg-dark:#0a0e27;
-      --cyan:#00d9ff;
-      --magenta:#ff006e;
-      --purple:#9d00ff;
-      --neon-pink:#ff10f0;
-      --neon-blue:#00ffff;
-      --text-light:#f0f0f0;
+      --bg-dark: #0a0e27;
+      --cyan: #00d9ff;
+      --magenta: #ff006e;
+      --purple: #9d00ff;
+      --neon-pink: #ff10f0;
+      --neon-blue: #00ffff;
+      --text-light: #f0f0f0;
+
+      /* ============ TV MODE CONTROLS (EASY TO TUNE) ============ */
+      --hud-padding: 40px;          /* requested */
+      --top-band-height: 420px;     /* requested */
+      --side-col-width: 480px;      /* makes left/right wider */
+
+      /* readable scaling */
+      --countdown-font: 132px;      /* BIG for TV */
+      --countdown-title: 18px;
+      --countdown-label: 12px;
+
+      --stability-title: 14px;
+      --stability-label: 12px;
+      --stability-percent: 12px;
+
+      --spotlight-name: 22px;
+      --spotlight-title: 14px;
+      --spotlight-desc: 12px;
+
+      --ticker-height: 54px;
+      --ticker-font: 14px;
     }
 
-    body{
+    body {
       background: linear-gradient(135deg, var(--bg-dark) 0%, #1a0a3a 100%);
       color: var(--text-light);
       font-family: 'Audiowide', sans-serif;
@@ -32,314 +53,313 @@
       flex-direction: column;
     }
 
-    @keyframes fade-in { from{opacity:0;} to{opacity:1;} }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
-    /* ============= TOP BAND (260px) ============= */
-    .top-band{
+    /* ============= TOP BAND (TV MODE) ============= */
+    .top-band {
       display: grid;
-      grid-template-columns: 320px 1fr 320px;
+      grid-template-columns: var(--side-col-width) 1fr var(--side-col-width);
       gap: 30px;
-      padding: 20px;
+      padding: var(--hud-padding);
       background: linear-gradient(180deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 10, 58, 0.9) 100%);
       border-bottom: 2px solid var(--cyan);
       box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
-      height: 260px;
+      height: var(--top-band-height);
       flex-shrink: 0;
     }
 
     /* --- TOP LEFT: SYSTEM STABILITY --- */
-    .system-stability{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:flex-start;
-      gap:12px;
+    .system-stability {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 14px;
+      padding-right: 10px;
     }
 
-    .system-label{
-      font-family:'Orbitron', monospace;
-      font-size:11px;
-      font-weight:700;
-      letter-spacing:2px;
-      color:var(--cyan);
-      text-shadow:0 0 10px var(--cyan);
-      margin-bottom:4px;
+    .system-label {
+      font-family: 'Orbitron', monospace;
+      font-size: var(--stability-title);
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      text-shadow: 0 0 12px var(--cyan);
+      margin-bottom: 6px;
+      text-transform: uppercase;
     }
 
-    .system-bar-container{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      width:100%;
+    .system-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
     }
 
-    .system-bar-label{
-      font-size:9px;
-      color:var(--magenta);
-      width:35px;
-      text-transform:uppercase;
-      font-weight:600;
+    .system-bar-label {
+      font-size: var(--stability-label);
+      color: var(--magenta);
+      width: 55px;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-family: 'Orbitron', monospace;
     }
 
-    .system-bar{
-      flex:1;
-      height:8px;
-      background: rgba(0,255,0,0.15);
-      border:1px solid rgba(0,255,0,0.3);
-      border-radius:2px;
-      overflow:hidden;
-      position:relative;
+    .system-bar {
+      flex: 1;
+      height: 12px;
+      background: rgba(0, 255, 0, 0.15);
+      border: 1px solid rgba(0, 255, 0, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
     }
 
-    .system-bar-fill{
-      height:100%;
-      box-shadow:0 0 10px;
+    .system-bar-fill {
+      height: 100%;
+      box-shadow: 0 0 12px;
       will-change: width, background-color;
       transition: width 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .system-bar-percent{
-      font-size:9px;
-      color:var(--cyan);
-      width:32px;
-      text-align:right;
-      font-weight:600;
-      font-family:'Orbitron', monospace;
+    .system-bar-percent {
+      font-size: var(--stability-percent);
+      color: var(--cyan);
+      width: 52px;
+      text-align: right;
+      font-weight: 900;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 1px;
     }
 
     /* --- TOP CENTER: COUNTDOWN & EQUALIZER --- */
-    .center-panel{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-start;
-      gap:20px;
-      padding-top:10px;
+    .center-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; /* center vertically in taller top band */
+      gap: 16px;
     }
 
-    .countdown-title{
-      font-family:'Orbitron', monospace;
-      font-size:16px;
-      font-weight:700;
-      letter-spacing:3px;
-      color:var(--cyan);
-      text-shadow:0 0 15px var(--cyan);
-      text-transform:uppercase;
-      margin-bottom:8px;
-      text-align:center;
+    .countdown-title {
+      font-family: 'Orbitron', monospace;
+      font-size: var(--countdown-title);
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      text-shadow: 0 0 16px var(--cyan);
+      text-transform: uppercase;
     }
 
-    .countdown{
-      font-family:'Orbitron', monospace;
-      font-size:72px;
-      font-weight:900;
-      color:var(--neon-pink);
+    .countdown {
+      font-family: 'Orbitron', monospace;
+      font-size: var(--countdown-font);
+      font-weight: 900;
+      color: var(--neon-pink);
       text-shadow:
         0 0 10px var(--neon-pink),
-        0 0 20px var(--neon-pink),
-        0 0 40px var(--magenta);
-      letter-spacing:4px;
-      line-height:1;
+        0 0 22px var(--neon-pink),
+        0 0 45px var(--magenta);
+      letter-spacing: 6px;
+      line-height: 1;
     }
 
-    .countdown-label{
-      font-family:'Orbitron', monospace;
-      font-size:10px;
-      letter-spacing:3px;
-      color:var(--cyan);
-      text-shadow:0 0 10px var(--cyan);
-      margin-top:-8px;
+    .countdown-label {
+      font-family: 'Orbitron', monospace;
+      font-size: var(--countdown-label);
+      letter-spacing: 4px;
+      color: var(--cyan);
+      text-shadow: 0 0 12px var(--cyan);
+      margin-top: -10px;
+      text-transform: uppercase;
     }
 
     /* EQUALIZER */
-    .equalizer{
-      display:flex;
-      align-items:flex-end;
-      gap:3px;
-      height:50px;
-      padding-top:10px;
-      width:100%;
-      justify-content:center;
+    .equalizer {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 70px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 4px;
     }
 
-    .eq-bar{
-      width:4px;
+    .eq-bar {
+      width: 5px;
       background: linear-gradient(180deg, var(--cyan) 0%, var(--neon-blue) 100%);
-      border-radius:1px;
-      box-shadow:0 0 10px var(--cyan);
-      animation:eq-dance 0.6s ease-in-out infinite;
+      border-radius: 2px;
+      box-shadow: 0 0 12px var(--cyan);
+      animation: eq-dance 0.6s ease-in-out infinite;
       transform-origin: bottom center;
-      flex-shrink:0;
+      flex-shrink: 0;
     }
 
-    .eq-bar:nth-child(1){animation-delay:0.0s;animation-duration:0.7s;height:15px;}
-    .eq-bar:nth-child(2){animation-delay:0.08s;animation-duration:0.65s;height:22px;}
-    .eq-bar:nth-child(3){animation-delay:0.16s;animation-duration:0.68s;height:28px;}
-    .eq-bar:nth-child(4){animation-delay:0.24s;animation-duration:0.62s;height:35px;}
-    .eq-bar:nth-child(5){animation-delay:0.32s;animation-duration:0.75s;height:40px;}
-    .eq-bar:nth-child(6){animation-delay:0.4s;animation-duration:0.66s;height:42px;}
-    .eq-bar:nth-child(7){animation-delay:0.48s;animation-duration:0.72s;height:40px;}
-    .eq-bar:nth-child(8){animation-delay:0.56s;animation-duration:0.64s;height:35px;}
-    .eq-bar:nth-child(9){animation-delay:0.64s;animation-duration:0.7s;height:28px;}
-    .eq-bar:nth-child(10){animation-delay:0.72s;animation-duration:0.65s;height:22px;}
-    .eq-bar:nth-child(11){animation-delay:0.8s;animation-duration:0.68s;height:18px;}
-    .eq-bar:nth-child(12){animation-delay:0.88s;animation-duration:0.62s;height:25px;}
-    .eq-bar:nth-child(13){animation-delay:0.96s;animation-duration:0.75s;height:32px;}
-    .eq-bar:nth-child(14){animation-delay:1.04s;animation-duration:0.66s;height:38px;}
-    .eq-bar:nth-child(15){animation-delay:1.12s;animation-duration:0.72s;height:42px;}
-    .eq-bar:nth-child(16){animation-delay:1.2s;animation-duration:0.64s;height:40px;}
-    .eq-bar:nth-child(17){animation-delay:1.28s;animation-duration:0.7s;height:35px;}
-    .eq-bar:nth-child(18){animation-delay:1.36s;animation-duration:0.65s;height:28px;}
-    .eq-bar:nth-child(19){animation-delay:1.44s;animation-duration:0.68s;height:22px;}
-    .eq-bar:nth-child(20){animation-delay:1.52s;animation-duration:0.62s;height:15px;}
+    .eq-bar:nth-child(1) { animation-delay: 0.0s; animation-duration: 0.7s; height: 18px; }
+    .eq-bar:nth-child(2) { animation-delay: 0.08s; animation-duration: 0.65s; height: 26px; }
+    .eq-bar:nth-child(3) { animation-delay: 0.16s; animation-duration: 0.68s; height: 34px; }
+    .eq-bar:nth-child(4) { animation-delay: 0.24s; animation-duration: 0.62s; height: 42px; }
+    .eq-bar:nth-child(5) { animation-delay: 0.32s; animation-duration: 0.75s; height: 50px; }
+    .eq-bar:nth-child(6) { animation-delay: 0.4s; animation-duration: 0.66s; height: 56px; }
+    .eq-bar:nth-child(7) { animation-delay: 0.48s; animation-duration: 0.72s; height: 52px; }
+    .eq-bar:nth-child(8) { animation-delay: 0.56s; animation-duration: 0.64s; height: 44px; }
+    .eq-bar:nth-child(9) { animation-delay: 0.64s; animation-duration: 0.7s; height: 36px; }
+    .eq-bar:nth-child(10){ animation-delay: 0.72s; animation-duration: 0.65s; height: 28px; }
+    .eq-bar:nth-child(11){ animation-delay: 0.8s; animation-duration: 0.68s; height: 22px; }
+    .eq-bar:nth-child(12){ animation-delay: 0.88s; animation-duration: 0.62s; height: 30px; }
+    .eq-bar:nth-child(13){ animation-delay: 0.96s; animation-duration: 0.75s; height: 38px; }
+    .eq-bar:nth-child(14){ animation-delay: 1.04s; animation-duration: 0.66s; height: 46px; }
+    .eq-bar:nth-child(15){ animation-delay: 1.12s; animation-duration: 0.72s; height: 56px; }
+    .eq-bar:nth-child(16){ animation-delay: 1.2s; animation-duration: 0.64s; height: 52px; }
+    .eq-bar:nth-child(17){ animation-delay: 1.28s; animation-duration: 0.7s; height: 44px; }
+    .eq-bar:nth-child(18){ animation-delay: 1.36s; animation-duration: 0.65s; height: 36px; }
+    .eq-bar:nth-child(19){ animation-delay: 1.44s; animation-duration: 0.68s; height: 28px; }
+    .eq-bar:nth-child(20){ animation-delay: 1.52s; animation-duration: 0.62s; height: 18px; }
 
-    @keyframes eq-dance{
-      0%,100%{transform:scaleY(1);}
-      50%{transform:scaleY(2.2);}
+    @keyframes eq-dance {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(2.2); }
     }
 
-    /* --- TOP RIGHT: ROTATING PANEL --- */
-    .right-panel{
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-start;
-      gap:15px;
-      position:relative;
-      overflow:hidden;
-      padding:15px;
-      background: rgba(0,217,255,0.05);
-      border:1px solid rgba(0,217,255,0.3);
-      border-radius:4px;
+    /* --- TOP RIGHT: Spotlight + Ticker Strip --- */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      justify-content: center;
+      align-items: stretch;
     }
 
-    .right-panel-content{
-      position:relative;
-      height:180px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    .spotlight-box {
+      padding: 18px;
+      background: rgba(0, 217, 255, 0.05);
+      border: 1px solid rgba(0, 217, 255, 0.35);
+      border-radius: 6px;
+      box-shadow: 0 0 26px rgba(0, 217, 255, 0.15);
+      min-height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
-    .panel-item{
-      position:absolute;
-      width:100%;
-      opacity:0;
-      animation: fade-in 0.8s ease-in-out forwards;
+    .spotlight {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      gap: 10px;
+      width: 100%;
+      animation: fade-in 0.7s ease-in-out forwards;
     }
 
-    .panel-item.hidden{ animation: fade-out 0.8s ease-in-out forwards; }
-    @keyframes fade-out{ from{opacity:1;} to{opacity:0;} }
-
-    .spotlight{
-      display:flex;
-      flex-direction:column;
-      text-align:center;
-      gap:8px;
+    .spotlight-name {
+      font-family: 'Orbitron', monospace;
+      font-size: var(--spotlight-name);
+      font-weight: 900;
+      color: var(--neon-pink);
+      text-shadow: 0 0 18px var(--neon-pink);
+      letter-spacing: 1px;
     }
 
-    .spotlight-name{
-      font-family:'Orbitron', monospace;
-      font-size:16px;
-      font-weight:700;
-      color:var(--neon-pink);
-      text-shadow:0 0 15px var(--neon-pink);
+    .spotlight-title {
+      font-size: var(--spotlight-title);
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
     }
 
-    .spotlight-title{
-      font-size:12px;
-      color:var(--cyan);
-      text-shadow:0 0 8px var(--cyan);
-      text-transform:uppercase;
-      letter-spacing:1px;
+    .spotlight-desc {
+      font-size: var(--spotlight-desc);
+      color: var(--text-light);
+      line-height: 1.5;
+      max-height: 92px;
+      overflow: hidden;
+      opacity: 0.95;
     }
 
-    .spotlight-desc{
-      font-size:11px;
-      color:var(--text-light);
-      line-height:1.4;
-      max-height:60px;
-      overflow:hidden;
-    }
-
-    .spotlight-underline{
-      height:2px;
-      margin-top:6px;
+    .spotlight-underline {
+      height: 2px;
+      margin-top: 4px;
       background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-      box-shadow:0 0 10px var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
       animation: underline-pulse 2s ease-in-out infinite;
     }
 
-    @keyframes underline-pulse{ 0%,100%{opacity:0.5;} 50%{opacity:1;} }
-
-    .ticker-wrapper{
-      position:relative;
-      width:100%;
-      height:40px;
-      overflow:hidden;
-      display:flex;
-      align-items:center;
+    @keyframes underline-pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
     }
 
-    .ticker{
-      display:flex;
-      gap:40px;
-      animation: ticker-scroll 20s linear infinite;
+    /* Ticker strip (short + wide) */
+    .ticker-strip {
+      height: var(--ticker-height);
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(0, 217, 255, 0.30);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 0 18px rgba(0, 217, 255, 0.12);
+      padding: 0 12px;
+    }
+
+    .ticker {
+      display: flex;
+      gap: 46px;
       will-change: transform;
+      animation: ticker-scroll 24s linear infinite;
+      align-items: center;
     }
 
-    .ticker-item{
-      white-space:nowrap;
-      font-family:'Orbitron', monospace;
-      font-size:13px;
-      color:var(--text-light);
+    .ticker-item {
+      white-space: nowrap;
+      font-family: 'Orbitron', monospace;
+      font-size: var(--ticker-font);
+      color: var(--text-light);
+      letter-spacing: 0.5px;
     }
 
-    .ticker-symbol{ color:var(--neon-pink); font-weight:700; margin-right:8px; }
-    .ticker-change{ font-size:12px; font-weight:700; margin-left:4px; }
+    .ticker-symbol { color: var(--neon-pink); font-weight: 900; margin-right: 10px; }
+    .ticker-change { font-size: 13px; font-weight: 900; margin-left: 6px; }
+    .ticker-change.up { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+    .ticker-change.down { color: #ff3333; text-shadow: 0 0 10px #ff3333; }
+    .ticker-alert { color: var(--magenta); font-size: 13px; margin-left: 6px; text-shadow: 0 0 10px var(--magenta); }
+    .ticker-critical { color: #ff0000; font-size: 13px; font-weight: 900; margin-left: 6px; text-shadow: 0 0 14px #ff0000; animation: critical-pulse 1s ease-in-out infinite; }
+    .ticker-question { color: var(--purple); font-size: 13px; font-weight: 900; margin-left: 6px; text-shadow: 0 0 12px var(--purple); }
 
-    .ticker-change.up{ color:#00ff00; text-shadow:0 0 8px #00ff00; }
-    .ticker-change.down{ color:#ff3333; text-shadow:0 0 8px #ff3333; }
-
-    .ticker-alert{ color:var(--magenta); font-size:11px; margin-left:4px; text-shadow:0 0 8px var(--magenta); }
-
-    .ticker-critical{
-      color:#ff0000;
-      font-size:11px;
-      font-weight:700;
-      margin-left:4px;
-      text-shadow:0 0 12px #ff0000;
-      animation: critical-pulse 1s ease-in-out infinite;
+    @keyframes critical-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
 
-    .ticker-question{
-      color:var(--purple);
-      font-size:12px;
-      font-weight:900;
-      margin-left:4px;
-      text-shadow:0 0 10px var(--purple);
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
-
-    @keyframes critical-pulse{ 0%,100%{opacity:1;} 50%{opacity:0.6;} }
-    @keyframes ticker-scroll{ 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
 
     /* ============= PHOTO WALL (2 rows × 10 cards) ============= */
-    .photo-wall{
-      flex:1;
-      display:grid;
+    .photo-wall {
+      flex: 1;
+      display: grid;
       grid-template-columns: repeat(10, 1fr);
-      gap:20px;
-      padding:30px;
-      align-content:start;
-      overflow:hidden;
+      gap: 20px;
+      padding: 30px;
+      align-content: start;
+      overflow: hidden;
+      grid-auto-flow: dense;
     }
 
-    .guest-card{
-      display:flex;
-      flex-direction:column;
-      background:#f5f5f0;
-      border:8px solid #f5f5f0;
-      border-bottom:35px solid #f5f5f0;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 20px rgba(0,217,255,0.15);
+    .guest-card {
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f0;
+      border: 8px solid #f5f5f0;
+      border-bottom: 35px solid #f5f5f0;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.15);
       overflow: visible;
       cursor: default;
       transform: perspective(1000px) rotateZ(-1deg);
@@ -348,96 +368,88 @@
       animation: card-slide-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    .guest-card.pulse{
-      animation: card-slide-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, card-pulse-glow 1.2s ease-out 0.1s forwards;
+    .guest-card.pulse {
+      animation: card-pulse-glow 1.2s ease-out forwards;
     }
 
-    @keyframes card-pulse-glow{
-      0%{ box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 40px rgba(255,16,240,0.6); }
-      50%{ box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 60px rgba(255,16,240,0.9); }
-      100%{ box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 20px rgba(0,217,255,0.15); }
+    @keyframes card-pulse-glow {
+      0%   { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 16, 240, 0.6); }
+      50%  { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 70px rgba(255, 16, 240, 0.95); }
+      100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.15); }
     }
 
-    @keyframes card-slide-in{
-      from{ opacity:0; transform: perspective(1000px) rotateZ(-1deg) translateY(40px); }
-      to{ opacity:1; transform: perspective(1000px) rotateZ(-1deg) translateY(0); }
+    @keyframes card-slide-in {
+      from { opacity: 0; transform: perspective(1000px) rotateZ(-1deg) translateY(60px); }
+      to   { opacity: 1; transform: perspective(1000px) rotateZ(-1deg) translateY(0); }
     }
 
-    .guest-image{
-      width:100%;
-      height:auto;
-      object-fit:contain;
-      background:#000;
-      display:block;
+    .guest-image {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      background: #000;
+      display: block;
     }
 
-    /* ========= AUTO-FIT LABEL AREA ========= */
-    .guest-info{
-      padding: 10px 8px;
-      background:#f5f5f0;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:4px;
-      text-align:center;
-
-      height: 70px; /* <-- If you want MORE white label space, increase this */
-      overflow:hidden;
+    .guest-info {
+      padding: 12px 8px;
+      background: #f5f5f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 4px;
+      text-align: center;
+      min-height: 46px;
     }
 
-    .guest-character,
-    .guest-real-name{
-      max-width:100%;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      line-height: 1.05;
+    .guest-character {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      color: var(--neon-pink);
+      line-height: 1.15;
+      text-shadow: none;
+      /* JS will auto-fit this to the available space */
     }
 
-    .guest-character{
-      font-family:'Orbitron', monospace;
-      font-weight:700;
-      color:var(--neon-pink);
+    .guest-real-name {
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 900;
+      font-family: 'Orbitron', monospace;
+      /* JS will auto-fit this too */
     }
 
-    .guest-real-name{
-      color:#333;
-      text-transform:uppercase;
-      letter-spacing:0.5px;
-    }
-
-    ::-webkit-scrollbar{ display:none; }
-
-    @media (max-width: 1100px){
-      .photo-wall{ grid-template-columns: repeat(5, 1fr); }
-    }
-    @media (max-width: 700px){
-      .top-band{ grid-template-columns: 1fr; height: auto; }
-      body{ overflow:auto; }
-      .photo-wall{ grid-template-columns: repeat(2, 1fr); overflow:auto; }
-    }
+    ::-webkit-scrollbar { display: none; }
   </style>
 </head>
 
 <body>
+  <!-- TOP BAND -->
   <div class="top-band">
+
+    <!-- LEFT: System Stability -->
     <div class="system-stability">
       <div class="system-label">Y2K SYSTEM STABILITY</div>
+
       <div class="system-bar-container">
         <div class="system-bar-label">Power</div>
         <div class="system-bar"><div class="system-bar-fill power"></div></div>
         <div class="system-bar-percent" id="powerPercent">100%</div>
       </div>
+
       <div class="system-bar-container">
         <div class="system-bar-label">Bank</div>
         <div class="system-bar"><div class="system-bar-fill bank"></div></div>
         <div class="system-bar-percent" id="bankPercent">100%</div>
       </div>
+
       <div class="system-bar-container">
         <div class="system-bar-label">Air</div>
         <div class="system-bar"><div class="system-bar-fill air"></div></div>
         <div class="system-bar-percent" id="airPercent">100%</div>
       </div>
+
       <div class="system-bar-container">
         <div class="system-bar-label">Net</div>
         <div class="system-bar"><div class="system-bar-fill net"></div></div>
@@ -445,12 +457,12 @@
       </div>
     </div>
 
+    <!-- CENTER: Countdown & Equalizer -->
     <div class="center-panel">
       <div class="countdown-title">DJ NEON'S MILLENNIUM COUNTDOWN</div>
       <div class="countdown" id="countdown">00:00:00</div>
       <div class="countdown-label">TILL MILLENNIUM</div>
-
-      <div class="equalizer">
+      <div class="equalizer" aria-hidden="true">
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
@@ -458,363 +470,336 @@
       </div>
     </div>
 
+    <!-- RIGHT: Spotlight ALWAYS + Ticker strip ALWAYS -->
     <div class="right-panel">
-      <div class="right-panel-content" id="rightPanelContent"></div>
+      <div class="spotlight-box" id="spotlightBox"></div>
+
+      <div class="ticker-strip">
+        <div class="ticker" id="ticker">
+          <!-- set 1 -->
+          <span class="ticker-item"><span class="ticker-symbol">Guests</span><span class="guest-count">0</span>/20 Checked In</span>
+          <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">Napster</span><span class="ticker-alert">Lawsuit Pending</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">Y2K Bug Risk</span><span class="ticker-critical">CRITICAL</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">ARE WE READY?</span><span class="ticker-question">???</span></span>
+
+          <!-- set 2 (duplicate for smooth loop) -->
+          <span class="ticker-item"><span class="ticker-symbol">Guests</span><span class="guest-count">0</span>/20 Checked In</span>
+          <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">Napster</span><span class="ticker-alert">Lawsuit Pending</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">Y2K Bug Risk</span><span class="ticker-critical">CRITICAL</span></span>
+          <span class="ticker-item"><span class="ticker-symbol">ARE WE READY?</span><span class="ticker-question">???</span></span>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- PHOTO WALL -->
   <div class="photo-wall" id="photoWall"></div>
 
   <script>
-    // Wrap EVERYTHING so we never collide with any other script globals.
-    (() => {
-      // =====================================================================
-      // ✅✅✅ EDIT THESE SETTINGS (SUPER EASY TO FIND) ✅✅✅
-      // =====================================================================
-      const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
+    /**********************************************************************
+     * ===================== SUPER OBVIOUS CONFIG =========================
+     * 1) SET YOUR COUNTDOWN TARGET TIME HERE
+     **********************************************************************/
+    const COUNTDOWN_TARGET_TIME = { hours: 22, minutes: 0, seconds: 0 }; // <-- EDIT THIS
 
-      // Use your ANON key (NOT service_role)
-      const SUPABASE_ANON_KEY =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubGdlaHVkZXN4emhtZXViYnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTU2NDIsImV4cCI6MjA4NjU5MTY0Mn0.xYfDMQn--cCi_npbfrFR297WFaE4A8zxQBME68KBNp0';
+    /**********************************************************************
+     * 2) SUPABASE CONNECTION
+     *    (Make sure this is your ANON key, NOT service_role)
+     **********************************************************************/
+    const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
 
-      // ✅ COUNTDOWN TARGET TIME (DAILY)
-      const COUNTDOWN_DAILY_TARGET = { hours: 22, minutes: 0, seconds: 0 }; // <-- CHANGE THIS
+    /**********************************************************************
+     * 3) BEHAVIOR
+     **********************************************************************/
+    const CONFIG = {
+      MAX_GUESTS: 20,
+      SPOTLIGHT_ROTATE_MS: 15000, // requested
+    };
 
-      // If you prefer a fixed datetime instead, uncomment this and the code below:
-      // const COUNTDOWN_FIXED_DATETIME = new Date('2026-01-01T00:00:00'); // <-- CHANGE THIS
+    // ---- Prevent "Identifier 'supabase' already declared" issues ----
+    const { createClient } = window.supabase;
+    const sb = window.__y2kSupabaseClient || (window.__y2kSupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
 
-      // =====================================================================
-      const CONFIG = {
-        MAX_GUESTS: 20,
-        ROTATION_INTERVAL_MS: 10000,
-        POLL_FALLBACK_MS: 5000,
-        DEBUG: true,
-      };
+    // ============= STATE =============
+    const guestMap = new Map();     // key: character_name -> guest row
+    const cardMap  = new Map();     // key: character_name -> DOM element
+    let spotlightIndex = 0;
 
-      // ---- Supabase client (named sbClient to avoid collisions) ----
-      const sbLib = window.supabase;
-      if (!sbLib?.createClient) {
-        console.error('Supabase library did not load. Check the CDN script tag.');
+    // ============= COUNTDOWN LOGIC =============
+    function updateCountdown() {
+      const now = new Date();
+      const target = new Date();
+      target.setHours(COUNTDOWN_TARGET_TIME.hours, COUNTDOWN_TARGET_TIME.minutes, COUNTDOWN_TARGET_TIME.seconds, 0);
+      if (now > target) target.setDate(target.getDate() + 1);
+
+      const diff = Math.max(0, target - now);
+      const totalSeconds = diff / 1000;
+
+      const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+
+      document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
+      updateSystemBars(totalSeconds);
+    }
+
+    function updateSystemBars(totalSeconds) {
+      const CRITICAL_THRESHOLD = 2.5 * 3600;
+
+      let healthPercent = totalSeconds > CRITICAL_THRESHOLD ? 100 : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
+
+      const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
+      const bankHealth  = Math.max(0, healthPercent - (100 - healthPercent) * 0.12);
+      const airHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.18);
+      const netHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.10);
+
+      document.querySelector('.system-bar-fill.power').style.width = powerHealth + '%';
+      document.querySelector('.system-bar-fill.bank').style.width  = bankHealth + '%';
+      document.querySelector('.system-bar-fill.air').style.width   = airHealth + '%';
+      document.querySelector('.system-bar-fill.net').style.width   = netHealth + '%';
+
+      document.getElementById('powerPercent').textContent = Math.round(powerHealth) + '%';
+      document.getElementById('bankPercent').textContent  = Math.round(bankHealth) + '%';
+      document.getElementById('airPercent').textContent   = Math.round(airHealth) + '%';
+      document.getElementById('netPercent').textContent   = Math.round(netHealth) + '%';
+
+      updateBarColor('.system-bar-fill.power', powerHealth);
+      updateBarColor('.system-bar-fill.bank', bankHealth);
+      updateBarColor('.system-bar-fill.air', airHealth);
+      updateBarColor('.system-bar-fill.net', netHealth);
+    }
+
+    function updateBarColor(selector, health) {
+      const bar = document.querySelector(selector);
+      let bgColor, glowColor;
+
+      if (health > 66) {
+        bgColor = '#00ff00'; glowColor = '#00ff00';
+      } else if (health > 33) {
+        bgColor = '#ffff00'; glowColor = '#ffff00';
+      } else {
+        bgColor = '#ff3333'; glowColor = '#ff3333';
+      }
+
+      bar.style.backgroundColor = bgColor;
+      bar.style.boxShadow = `0 0 12px ${glowColor}`;
+    }
+
+    // ============= HELPERS =============
+    function escapeHTML(text) {
+      const div = document.createElement('div');
+      div.textContent = text ?? '';
+      return div.innerHTML;
+    }
+
+    function getCheckedInGuestsSorted() {
+      // Only guests with real_name count as "checked in"
+      const guests = Array.from(guestMap.values()).filter(g => g && g.real_name);
+      guests.sort((a, b) => {
+        const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return ta - tb;
+      });
+      return guests;
+    }
+
+    function updateGuestCountTicker() {
+      const count = getCheckedInGuestsSorted().length;
+      document.querySelectorAll('.guest-count').forEach(el => el.textContent = String(count));
+    }
+
+    // Auto-fit text inside polaroid label area
+    function fitText(el, maxPx, minPx) {
+      if (!el) return;
+      el.style.whiteSpace = 'nowrap';
+      el.style.overflow = 'hidden';
+      el.style.textOverflow = 'ellipsis';
+
+      let size = maxPx;
+      el.style.fontSize = size + 'px';
+
+      // Reduce until it fits width
+      while (size > minPx && el.scrollWidth > el.clientWidth) {
+        size -= 1;
+        el.style.fontSize = size + 'px';
+      }
+    }
+
+    function fitPolaroidText(card) {
+      const nameEl = card.querySelector('.guest-character');
+      const realEl = card.querySelector('.guest-real-name');
+
+      // Give them a width to measure against (they are centered, so this works fine)
+      fitText(nameEl, 18, 10);
+      fitText(realEl, 13, 9);
+    }
+
+    // ============= PHOTO WALL RENDERING =============
+    function renderNewGuest(guest, { isNew } = { isNew: false }) {
+      const photoWall = document.getElementById('photoWall');
+
+      const card = document.createElement('div');
+      card.className = 'guest-card' + (isNew ? ' pulse' : '');
+
+      const imageHTML = guest.photo_url
+        ? `<img src="${guest.photo_url}" alt="${escapeHTML(guest.character_name)}" class="guest-image" onerror="this.style.display='none'">`
+        : '';
+
+      card.innerHTML = `
+        ${imageHTML}
+        <div class="guest-info">
+          <div class="guest-character">${escapeHTML(guest.character_name)}</div>
+          <div class="guest-real-name">${escapeHTML(guest.real_name)}</div>
+        </div>
+      `;
+
+      photoWall.appendChild(card);
+      cardMap.set(guest.character_name, card);
+
+      // Fit text after it’s in DOM
+      requestAnimationFrame(() => fitPolaroidText(card));
+    }
+
+    function updateExistingGuestCard(guest) {
+      const card = cardMap.get(guest.character_name);
+      if (!card) return;
+
+      const nameEl = card.querySelector('.guest-character');
+      const realEl = card.querySelector('.guest-real-name');
+      if (nameEl) nameEl.textContent = guest.character_name ?? '';
+      if (realEl) realEl.textContent = guest.real_name ?? '';
+
+      // Update image if needed
+      const img = card.querySelector('img.guest-image');
+      if (guest.photo_url) {
+        if (img) {
+          if (img.src !== guest.photo_url) img.src = guest.photo_url;
+        } else {
+          const newImg = document.createElement('img');
+          newImg.className = 'guest-image';
+          newImg.alt = guest.character_name || '';
+          newImg.src = guest.photo_url;
+          newImg.onerror = () => { newImg.style.display = 'none'; };
+          card.insertBefore(newImg, card.firstChild);
+        }
+      }
+
+      requestAnimationFrame(() => fitPolaroidText(card));
+    }
+
+    // ============= SPOTLIGHT (always visible) =============
+    function renderSpotlight() {
+      const box = document.getElementById('spotlightBox');
+      const guests = getCheckedInGuestsSorted();
+
+      if (guests.length === 0) {
+        box.innerHTML = `
+          <div class="spotlight">
+            <div class="spotlight-name">AWAITING CHECK-INS…</div>
+            <div class="spotlight-title">SYSTEM STATUS</div>
+            <div class="spotlight-desc">No guests have checked in yet. Send them to the upload page and let the chaos begin.</div>
+            <div class="spotlight-underline"></div>
+          </div>
+        `;
         return;
       }
-      const sbClient = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // ============= STATE =============
-      const guestMap = new Map(); // key = character_name
-      let rightPanelMode = 'spotlight';
-      let rightPanelIndex = 0;
+      const guest = guests[spotlightIndex % guests.length];
+      spotlightIndex++;
 
-      // ============= COUNTDOWN LOGIC =============
-      function updateCountdown() {
-        const now = new Date();
+      box.innerHTML = `
+        <div class="spotlight">
+          <div class="spotlight-name">${escapeHTML(guest.character_name)}</div>
+          <div class="spotlight-title">${escapeHTML(guest.character_title || 'Mystery Guest')}</div>
+          <div class="spotlight-desc">${escapeHTML(guest.character_description || 'No description')}</div>
+          <div class="spotlight-underline"></div>
+        </div>
+      `;
+    }
 
-        // Fixed datetime option:
-        // const diff = Math.max(0, COUNTDOWN_FIXED_DATETIME - now);
-        // renderCountdown(diff);
-        // return;
-
-        const target = new Date();
-        target.setHours(
-          COUNTDOWN_DAILY_TARGET.hours,
-          COUNTDOWN_DAILY_TARGET.minutes,
-          COUNTDOWN_DAILY_TARGET.seconds,
-          0
-        );
-        if (now > target) target.setDate(target.getDate() + 1);
-
-        const diff = Math.max(0, target - now);
-        renderCountdown(diff);
-      }
-
-      function renderCountdown(diffMs) {
-        const hours = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
-        const minutes = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
-        const seconds = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
-
-        document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
-
-        const totalSeconds = diffMs / 1000;
-        updateSystemBars(totalSeconds);
-      }
-
-      function updateSystemBars(totalSeconds) {
-        const CRITICAL_THRESHOLD = 2.5 * 3600;
-
-        let healthPercent = totalSeconds > CRITICAL_THRESHOLD
-          ? 100
-          : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
-
-        const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
-        const bankHealth  = Math.max(0, healthPercent - (100 - healthPercent) * 0.12);
-        const airHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.18);
-        const netHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.10);
-
-        document.querySelector('.system-bar-fill.power').style.width = powerHealth + '%';
-        document.querySelector('.system-bar-fill.bank').style.width  = bankHealth + '%';
-        document.querySelector('.system-bar-fill.air').style.width   = airHealth + '%';
-        document.querySelector('.system-bar-fill.net').style.width   = netHealth + '%';
-
-        document.getElementById('powerPercent').textContent = Math.round(powerHealth) + '%';
-        document.getElementById('bankPercent').textContent  = Math.round(bankHealth) + '%';
-        document.getElementById('airPercent').textContent   = Math.round(airHealth) + '%';
-        document.getElementById('netPercent').textContent   = Math.round(netHealth) + '%';
-
-        updateBarColor('.system-bar-fill.power', powerHealth);
-        updateBarColor('.system-bar-fill.bank', bankHealth);
-        updateBarColor('.system-bar-fill.air', airHealth);
-        updateBarColor('.system-bar-fill.net', netHealth);
-      }
-
-      function updateBarColor(selector, health) {
-        const bar = document.querySelector(selector);
-        let bgColor, glowColor;
-
-        if (health > 66) {
-          bgColor = '#00ff00';
-          glowColor = '#00ff00';
-        } else if (health > 33) {
-          bgColor = '#ffff00';
-          glowColor = '#ffff00';
-        } else {
-          bgColor = '#ff3333';
-          glowColor = '#ff3333';
-        }
-
-        bar.style.backgroundColor = bgColor;
-        bar.style.boxShadow = `0 0 10px ${glowColor}`;
-      }
-
-      // ============= TEXT AUTO-FIT (MAX SIZE BUT ALWAYS FITS) =============
-      function fitGuestCardText(card) {
-        const info = card.querySelector('.guest-info');
-        const charEl = card.querySelector('.guest-character');
-        const realEl = card.querySelector('.guest-real-name');
-        if (!info || !charEl || !realEl) return;
-
-        let charSize = 26;
-        let realSize = 18;
-
-        const charMin = 10;
-        const realMin = 8;
-
-        charEl.style.fontSize = charSize + 'px';
-        realEl.style.fontSize = realSize + 'px';
-
-        for (let i = 0; i < 200; i++) {
-          const fitsHeight = info.scrollHeight <= info.clientHeight;
-          const charFitsWidth = charEl.scrollWidth <= charEl.clientWidth;
-          const realFitsWidth = realEl.scrollWidth <= realEl.clientWidth;
-
-          if (fitsHeight && charFitsWidth && realFitsWidth) break;
-
-          const charOverflow = charEl.scrollWidth - charEl.clientWidth;
-          const realOverflow = realEl.scrollWidth - realEl.clientWidth;
-
-          const shouldShrinkChar =
-            (charOverflow > realOverflow && charSize > charMin) || realSize <= realMin;
-
-          if (shouldShrinkChar && charSize > charMin) {
-            charSize -= 0.5;
-            charEl.style.fontSize = charSize + 'px';
-          } else if (realSize > realMin) {
-            realSize -= 0.5;
-            realEl.style.fontSize = realSize + 'px';
-          } else if (charSize > charMin) {
-            charSize -= 0.5;
-            charEl.style.fontSize = charSize + 'px';
-          } else {
-            break;
-          }
-        }
-      }
-
-      window.addEventListener('resize', () => {
-        document.querySelectorAll('.guest-card').forEach(fitGuestCardText);
-      });
-
-      // ============= SUPABASE SYNC (REALTIME + POLL FALLBACK) =============
-      async function fetchAssignedGuests() {
-        const { data, error } = await sbClient
+    // ============= SUPABASE REALTIME + INITIAL LOAD =============
+    async function initializeGuests() {
+      try {
+        // Initial fetch: checked-in guests only
+        const { data, error } = await sb
           .from('guests')
           .select('*')
           .not('real_name', 'is', null)
           .order('created_at', { ascending: true });
 
-        if (error) throw error;
-        return data || [];
-      }
-
-      function safeId(str) {
-        return String(str || '')
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)/g, '');
-      }
-
-      function escapeHTML(text) {
-        const div = document.createElement('div');
-        div.textContent = text ?? '';
-        return div.innerHTML;
-      }
-
-      function renderOrUpdateGuestCard(guest, { animate = false } = {}) {
-        if (!guest || !guest.character_name || !guest.real_name) return;
-
-        const wall = document.getElementById('photoWall');
-        const id = `guest-${safeId(guest.character_name)}`;
-        let card = document.getElementById(id);
-
-        const imageHTML = guest.photo_url
-          ? `<img src="${guest.photo_url}" alt="${escapeHTML(guest.character_name)}" class="guest-image" onerror="this.style.display='none'">`
-          : '';
-
-        if (!card) {
-          card = document.createElement('div');
-          card.id = id;
-          card.className = 'guest-card' + (animate ? ' pulse' : '');
-          card.innerHTML = `
-            ${imageHTML}
-            <div class="guest-info">
-              <div class="guest-character">${escapeHTML(guest.character_name)}</div>
-              <div class="guest-real-name">${escapeHTML(guest.real_name)}</div>
-            </div>
-          `;
-          wall.appendChild(card);
-
-          requestAnimationFrame(() => fitGuestCardText(card));
-
-          if (animate) setTimeout(() => card.classList.remove('pulse'), 1600);
+        if (error) {
+          console.error('Initial fetch error:', error);
           return;
         }
 
-        card.classList.toggle('pulse', animate);
-
-        const existingImg = card.querySelector('img.guest-image');
-        if (guest.photo_url) {
-          if (!existingImg) {
-            card.insertAdjacentHTML('afterbegin', imageHTML);
-          } else if (existingImg.src !== guest.photo_url) {
-            existingImg.src = guest.photo_url;
+        // Load initial (no pulse for existing)
+        data.slice(0, CONFIG.MAX_GUESTS).forEach(guest => {
+          if (guest?.character_name && guest?.real_name) {
+            guestMap.set(guest.character_name, guest);
+            renderNewGuest(guest, { isNew: false });
           }
-        }
-
-        const charEl = card.querySelector('.guest-character');
-        const realEl = card.querySelector('.guest-real-name');
-        if (charEl) charEl.textContent = guest.character_name;
-        if (realEl) realEl.textContent = guest.real_name;
-
-        requestAnimationFrame(() => fitGuestCardText(card));
-
-        if (animate) setTimeout(() => card.classList.remove('pulse'), 1600);
-      }
-
-      async function syncGuests({ animateNew = false } = {}) {
-        const rows = await fetchAssignedGuests();
-
-        rows.forEach((guest) => {
-          if (!guest.character_name || !guest.real_name) return;
-          if (guestMap.size >= CONFIG.MAX_GUESTS && !guestMap.has(guest.character_name)) return;
-
-          const prev = guestMap.get(guest.character_name);
-          const isNew = !prev;
-
-          guestMap.set(guest.character_name, guest);
-          renderOrUpdateGuestCard(guest, { animate: animateNew && isNew });
         });
-      }
 
-      function setupRealtime() {
-        sbClient
-          .channel('guests-live')
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'guests' },
-            (payload) => {
-              const g = payload.new;
+        updateGuestCountTicker();
+        renderSpotlight();
 
-              if (CONFIG.DEBUG) {
-                console.log('[Realtime] event:', payload.eventType, g);
+        // Real-time subscription
+        const channel = sb
+          .channel('guests-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, (payload) => {
+            const guest = payload.new;
+            if (!guest || !guest.character_name) return;
+
+            const wasCheckedIn = !!guestMap.get(guest.character_name)?.real_name;
+            const isCheckedIn  = !!guest.real_name;
+
+            // update map always
+            guestMap.set(guest.character_name, guest);
+
+            // If it just became checked-in (real_name went from null -> value)
+            if (!wasCheckedIn && isCheckedIn) {
+              // only render if we still have room
+              const currentCount = getCheckedInGuestsSorted().length;
+              if (currentCount <= CONFIG.MAX_GUESTS && !cardMap.has(guest.character_name)) {
+                renderNewGuest(guest, { isNew: true });
+              } else if (cardMap.has(guest.character_name)) {
+                updateExistingGuestCard(guest);
               }
-
-              if (!g || !g.character_name || !g.real_name) return;
-              if (guestMap.size >= CONFIG.MAX_GUESTS && !guestMap.has(g.character_name)) return;
-
-              const wasMissing = !guestMap.has(g.character_name);
-              guestMap.set(g.character_name, g);
-              renderOrUpdateGuestCard(g, { animate: wasMissing });
+            } else if (isCheckedIn && cardMap.has(guest.character_name)) {
+              // normal update (photo changed, name changed, etc.)
+              updateExistingGuestCard(guest);
             }
-          )
-          .subscribe((status) => console.log('[Realtime status]', status));
+
+            updateGuestCountTicker();
+          })
+          .subscribe((status) => {
+            console.log('[Realtime status]', status);
+          });
+
+      } catch (err) {
+        console.error('Initialization error:', err);
       }
+    }
 
-      // ============= RIGHT PANEL ROTATION =============
-      function renderRightPanel() {
-        const guests = Array.from(guestMap.values());
-        const container = document.getElementById('rightPanelContent');
-        const oldItem = container.querySelector('.panel-item');
-        if (oldItem) {
-          oldItem.classList.add('hidden');
-          setTimeout(() => oldItem.remove(), 800);
-        }
+    // ============= INIT =============
+    function init() {
+      updateCountdown();
+      initializeGuests();
 
-        const newItem = document.createElement('div');
-        newItem.className = 'panel-item';
+      // loops
+      setInterval(updateCountdown, 1000);
+      setInterval(renderSpotlight, CONFIG.SPOTLIGHT_ROTATE_MS);
 
-        if (rightPanelMode === 'spotlight' && guests.length > 0) {
-          const guest = guests[rightPanelIndex % guests.length];
-          newItem.innerHTML = `
-            <div class="spotlight">
-              <div class="spotlight-name">${escapeHTML(guest.character_name)}</div>
-              <div class="spotlight-title">${escapeHTML(guest.character_title || 'Mystery Guest')}</div>
-              <div class="spotlight-desc">${escapeHTML(guest.character_description || 'No description')}</div>
-              <div class="spotlight-underline"></div>
-            </div>
-          `;
-          rightPanelIndex++;
-        } else {
-          newItem.innerHTML = `
-            <div class="ticker-wrapper">
-              <div class="ticker">
-                <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
-                <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
-                <span class="ticker-item"><span class="ticker-symbol">Napster</span><span class="ticker-alert">Lawsuit Pending</span></span>
-                <span class="ticker-item"><span class="ticker-symbol">Y2K Bug Risk</span><span class="ticker-critical">CRITICAL</span></span>
-                <span class="ticker-item"><span class="ticker-symbol">ARE WE READY?</span><span class="ticker-question">???</span></span>
-                <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
-                <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
-              </div>
-            </div>
-          `;
-        }
+      // keep ticker count fresh even if nothing else triggers
+      setInterval(updateGuestCountTicker, 5000);
+    }
 
-        container.appendChild(newItem);
-        rightPanelMode = rightPanelMode === 'spotlight' ? 'ticker' : 'spotlight';
-      }
-
-      // ============= INIT =============
-      async function init() {
-        updateCountdown();
-
-        try {
-          await syncGuests({ animateNew: false });
-          setupRealtime();
-
-          // Poll fallback (keeps working even if realtime is blocked)
-          setInterval(() => {
-            syncGuests({ animateNew: true }).catch((e) => console.warn('[Poll sync error]', e));
-          }, CONFIG.POLL_FALLBACK_MS);
-
-        } catch (e) {
-          console.error('Init error:', e);
-        }
-
-        renderRightPanel();
-        setInterval(updateCountdown, 1000);
-        setInterval(renderRightPanel, CONFIG.ROTATION_INTERVAL_MS);
-      }
-
-      init();
-    })();
+    init();
   </script>
 </body>
 </html>
