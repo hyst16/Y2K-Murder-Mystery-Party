@@ -348,7 +348,9 @@
       animation: card-slide-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    .guest-card.pulse{ animation: card-slide-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, card-pulse-glow 1.2s ease-out 0.1s forwards; }
+    .guest-card.pulse{
+      animation: card-slide-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, card-pulse-glow 1.2s ease-out 0.1s forwards;
+    }
 
     @keyframes card-pulse-glow{
       0%{ box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 40px rgba(255,16,240,0.6); }
@@ -379,8 +381,7 @@
       gap:4px;
       text-align:center;
 
-      /* KEY: fixed label height so JS can "fit" text inside it */
-      height: 70px;      /* <-- if you want more white label height, increase this */
+      height: 70px; /* <-- If you want MORE white label space, increase this */
       overflow:hidden;
     }
 
@@ -397,20 +398,16 @@
       font-family:'Orbitron', monospace;
       font-weight:700;
       color:var(--neon-pink);
-      text-shadow:none;
     }
 
     .guest-real-name{
-      font-size: 12px; /* JS will override this */
       color:#333;
       text-transform:uppercase;
       letter-spacing:0.5px;
-      margin-top:0;
     }
 
     ::-webkit-scrollbar{ display:none; }
 
-    /* Small screens: don't force 10 columns */
     @media (max-width: 1100px){
       .photo-wall{ grid-template-columns: repeat(5, 1fr); }
     }
@@ -423,9 +420,7 @@
 </head>
 
 <body>
-  <!-- TOP BAND -->
   <div class="top-band">
-    <!-- LEFT -->
     <div class="system-stability">
       <div class="system-label">Y2K SYSTEM STABILITY</div>
       <div class="system-bar-container">
@@ -450,11 +445,11 @@
       </div>
     </div>
 
-    <!-- CENTER -->
     <div class="center-panel">
       <div class="countdown-title">DJ NEON'S MILLENNIUM COUNTDOWN</div>
       <div class="countdown" id="countdown">00:00:00</div>
       <div class="countdown-label">TILL MILLENNIUM</div>
+
       <div class="equalizer">
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
@@ -463,382 +458,363 @@
       </div>
     </div>
 
-    <!-- RIGHT -->
     <div class="right-panel">
       <div class="right-panel-content" id="rightPanelContent"></div>
     </div>
   </div>
 
-  <!-- PHOTO WALL -->
   <div class="photo-wall" id="photoWall"></div>
 
   <script>
-    // =====================================================================
-    // ✅✅✅ EDIT THESE SETTINGS (SUPER IMPORTANT / EASY TO FIND) ✅✅✅
-    // =====================================================================
+    // Wrap EVERYTHING so we never collide with any other script globals.
+    (() => {
+      // =====================================================================
+      // ✅✅✅ EDIT THESE SETTINGS (SUPER EASY TO FIND) ✅✅✅
+      // =====================================================================
+      const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
 
-    const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
+      // Use your ANON key (NOT service_role)
+      const SUPABASE_ANON_KEY =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubGdlaHVkZXN4emhtZXViYnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTU2NDIsImV4cCI6MjA4NjU5MTY0Mn0.xYfDMQn--cCi_npbfrFR297WFaE4A8zxQBME68KBNp0';
 
-    // Use your ANON key (JWT) here (NOT service_role)
-    const SUPABASE_ANON_KEY =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubGdlaHVkZXN4emhtZXViYnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTU2NDIsImV4cCI6MjA4NjU5MTY0Mn0.xYfDMQn--cCi_npbfrFR297WFaE4A8zxQBME68KBNp0';
+      // ✅ COUNTDOWN TARGET TIME (DAILY)
+      const COUNTDOWN_DAILY_TARGET = { hours: 22, minutes: 0, seconds: 0 }; // <-- CHANGE THIS
 
-    // ✅ COUNTDOWN TARGET TIME
-    // Option A (recommended): a DAILY time that resets each day
-    const COUNTDOWN_DAILY_TARGET = { hours: 22, minutes: 0, seconds: 0 }; // <-- CHANGE THIS
+      // If you prefer a fixed datetime instead, uncomment this and the code below:
+      // const COUNTDOWN_FIXED_DATETIME = new Date('2026-01-01T00:00:00'); // <-- CHANGE THIS
 
-    // Option B (fixed date/time): uncomment and use this instead
-    // const COUNTDOWN_FIXED_DATETIME = new Date('2026-01-01T00:00:00'); // <-- CHANGE THIS
+      // =====================================================================
+      const CONFIG = {
+        MAX_GUESTS: 20,
+        ROTATION_INTERVAL_MS: 10000,
+        POLL_FALLBACK_MS: 5000,
+        DEBUG: true,
+      };
 
-    // =====================================================================
-    // Other knobs
-    // =====================================================================
-    const CONFIG = {
-      MAX_GUESTS: 20,
-      ROTATION_INTERVAL_MS: 10000,
-      POLL_FALLBACK_MS: 5000,   // <-- even if realtime fails, we still update via polling
-      DEBUG: true,
-    };
-
-    // Initialize Supabase
-    const { createClient } = window.supabase;
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ============= STATE =============
-    let guestMap = new Map(); // key = character_name
-    let rightPanelMode = 'spotlight';
-    let rightPanelIndex = 0;
-
-    // ============= COUNTDOWN LOGIC =============
-    function updateCountdown() {
-      const now = new Date();
-
-      // Option B: fixed date/time countdown
-      // if (typeof COUNTDOWN_FIXED_DATETIME !== 'undefined') {
-      //   const diff = Math.max(0, COUNTDOWN_FIXED_DATETIME - now);
-      //   const totalSeconds = diff / 1000;
-      //   renderCountdown(diff, totalSeconds);
-      //   return;
-      // }
-
-      // Option A: daily countdown (default)
-      const target = new Date();
-      target.setHours(
-        COUNTDOWN_DAILY_TARGET.hours,
-        COUNTDOWN_DAILY_TARGET.minutes,
-        COUNTDOWN_DAILY_TARGET.seconds,
-        0
-      );
-      if (now > target) target.setDate(target.getDate() + 1);
-
-      const diff = Math.max(0, target - now);
-      const totalSeconds = diff / 1000;
-      renderCountdown(diff, totalSeconds);
-    }
-
-    function renderCountdown(diffMs, totalSeconds) {
-      const hours = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
-      const minutes = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
-      const seconds = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
-
-      document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
-      updateSystemBars(totalSeconds);
-    }
-
-    function updateSystemBars(totalSeconds) {
-      const CRITICAL_THRESHOLD = 2.5 * 3600;
-
-      let healthPercent = totalSeconds > CRITICAL_THRESHOLD
-        ? 100
-        : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
-
-      const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
-      const bankHealth  = Math.max(0, healthPercent - (100 - healthPercent) * 0.12);
-      const airHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.18);
-      const netHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.10);
-
-      document.querySelector('.system-bar-fill.power').style.width = powerHealth + '%';
-      document.querySelector('.system-bar-fill.bank').style.width  = bankHealth + '%';
-      document.querySelector('.system-bar-fill.air').style.width   = airHealth + '%';
-      document.querySelector('.system-bar-fill.net').style.width   = netHealth + '%';
-
-      document.getElementById('powerPercent').textContent = Math.round(powerHealth) + '%';
-      document.getElementById('bankPercent').textContent  = Math.round(bankHealth) + '%';
-      document.getElementById('airPercent').textContent   = Math.round(airHealth) + '%';
-      document.getElementById('netPercent').textContent   = Math.round(netHealth) + '%';
-
-      updateBarColor('.system-bar-fill.power', powerHealth);
-      updateBarColor('.system-bar-fill.bank', bankHealth);
-      updateBarColor('.system-bar-fill.air', airHealth);
-      updateBarColor('.system-bar-fill.net', netHealth);
-    }
-
-    function updateBarColor(selector, health) {
-      const bar = document.querySelector(selector);
-      let bgColor, glowColor;
-
-      if (health > 66) {
-        bgColor = '#00ff00';
-        glowColor = '#00ff00';
-      } else if (health > 33) {
-        bgColor = '#ffff00';
-        glowColor = '#ffff00';
-      } else {
-        bgColor = '#ff3333';
-        glowColor = '#ff3333';
-      }
-
-      bar.style.backgroundColor = bgColor;
-      bar.style.boxShadow = `0 0 10px ${glowColor}`;
-    }
-
-    // ============= TEXT AUTO-FIT (MAX SIZE BUT ALWAYS FITS) =============
-    function fitGuestCardText(card) {
-      const info = card.querySelector('.guest-info');
-      const charEl = card.querySelector('.guest-character');
-      const realEl = card.querySelector('.guest-real-name');
-      if (!info || !charEl || !realEl) return;
-
-      // Start big, shrink until fits
-      let charSize = 26;
-      let realSize = 18;
-
-      const charMin = 10;
-      const realMin = 8;
-
-      charEl.style.fontSize = charSize + 'px';
-      realEl.style.fontSize = realSize + 'px';
-
-      for (let i = 0; i < 200; i++) {
-        const fitsHeight = info.scrollHeight <= info.clientHeight;
-        const charFitsWidth = charEl.scrollWidth <= charEl.clientWidth;
-        const realFitsWidth = realEl.scrollWidth <= realEl.clientWidth;
-
-        if (fitsHeight && charFitsWidth && realFitsWidth) break;
-
-        const charOverflow = charEl.scrollWidth - charEl.clientWidth;
-        const realOverflow = realEl.scrollWidth - realEl.clientWidth;
-
-        const shouldShrinkChar =
-          (charOverflow > realOverflow && charSize > charMin) || realSize <= realMin;
-
-        if (shouldShrinkChar && charSize > charMin) {
-          charSize -= 0.5;
-          charEl.style.fontSize = charSize + 'px';
-        } else if (realSize > realMin) {
-          realSize -= 0.5;
-          realEl.style.fontSize = realSize + 'px';
-        } else if (charSize > charMin) {
-          charSize -= 0.5;
-          charEl.style.fontSize = charSize + 'px';
-        } else {
-          break;
-        }
-      }
-    }
-
-    window.addEventListener('resize', () => {
-      document.querySelectorAll('.guest-card').forEach(fitGuestCardText);
-    });
-
-    // ============= SUPABASE SYNC (REALTIME + POLL FALLBACK) =============
-    async function fetchAssignedGuests() {
-      const { data, error } = await supabase
-        .from('guests')
-        .select('*')
-        .not('real_name', 'is', null)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      return data || [];
-    }
-
-    function safeId(str) {
-      return String(str || '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-    }
-
-    function escapeHTML(text) {
-      const div = document.createElement('div');
-      div.textContent = text ?? '';
-      return div.innerHTML;
-    }
-
-    function renderOrUpdateGuestCard(guest, { animate = false } = {}) {
-      if (!guest || !guest.character_name || !guest.real_name) return;
-
-      const wall = document.getElementById('photoWall');
-      const id = `guest-${safeId(guest.character_name)}`;
-      let card = document.getElementById(id);
-
-      const imageHTML = guest.photo_url
-        ? `<img src="${guest.photo_url}" alt="${escapeHTML(guest.character_name)}" class="guest-image" onerror="this.style.display='none'">`
-        : '';
-
-      if (!card) {
-        card = document.createElement('div');
-        card.id = id;
-        card.className = 'guest-card' + (animate ? ' pulse' : '');
-        card.innerHTML = `
-          ${imageHTML}
-          <div class="guest-info">
-            <div class="guest-character">${escapeHTML(guest.character_name)}</div>
-            <div class="guest-real-name">${escapeHTML(guest.real_name)}</div>
-          </div>
-        `;
-        wall.appendChild(card);
-
-        // Let layout happen, then auto-fit
-        requestAnimationFrame(() => fitGuestCardText(card));
-
-        // Remove pulse class after animation window (optional)
-        if (animate) {
-          setTimeout(() => card.classList.remove('pulse'), 1600);
-        }
+      // ---- Supabase client (named sbClient to avoid collisions) ----
+      const sbLib = window.supabase;
+      if (!sbLib?.createClient) {
+        console.error('Supabase library did not load. Check the CDN script tag.');
         return;
       }
+      const sbClient = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // Update existing
-      card.classList.toggle('pulse', animate);
+      // ============= STATE =============
+      const guestMap = new Map(); // key = character_name
+      let rightPanelMode = 'spotlight';
+      let rightPanelIndex = 0;
 
-      const existingImg = card.querySelector('img.guest-image');
-      if (guest.photo_url) {
-        if (!existingImg) {
-          card.insertAdjacentHTML('afterbegin', imageHTML);
-        } else if (existingImg.src !== guest.photo_url) {
-          existingImg.src = guest.photo_url;
+      // ============= COUNTDOWN LOGIC =============
+      function updateCountdown() {
+        const now = new Date();
+
+        // Fixed datetime option:
+        // const diff = Math.max(0, COUNTDOWN_FIXED_DATETIME - now);
+        // renderCountdown(diff);
+        // return;
+
+        const target = new Date();
+        target.setHours(
+          COUNTDOWN_DAILY_TARGET.hours,
+          COUNTDOWN_DAILY_TARGET.minutes,
+          COUNTDOWN_DAILY_TARGET.seconds,
+          0
+        );
+        if (now > target) target.setDate(target.getDate() + 1);
+
+        const diff = Math.max(0, target - now);
+        renderCountdown(diff);
+      }
+
+      function renderCountdown(diffMs) {
+        const hours = String(Math.floor(diffMs / 3600000)).padStart(2, '0');
+        const minutes = String(Math.floor((diffMs % 3600000) / 60000)).padStart(2, '0');
+        const seconds = String(Math.floor((diffMs % 60000) / 1000)).padStart(2, '0');
+
+        document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
+
+        const totalSeconds = diffMs / 1000;
+        updateSystemBars(totalSeconds);
+      }
+
+      function updateSystemBars(totalSeconds) {
+        const CRITICAL_THRESHOLD = 2.5 * 3600;
+
+        let healthPercent = totalSeconds > CRITICAL_THRESHOLD
+          ? 100
+          : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
+
+        const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
+        const bankHealth  = Math.max(0, healthPercent - (100 - healthPercent) * 0.12);
+        const airHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.18);
+        const netHealth   = Math.max(0, healthPercent - (100 - healthPercent) * 0.10);
+
+        document.querySelector('.system-bar-fill.power').style.width = powerHealth + '%';
+        document.querySelector('.system-bar-fill.bank').style.width  = bankHealth + '%';
+        document.querySelector('.system-bar-fill.air').style.width   = airHealth + '%';
+        document.querySelector('.system-bar-fill.net').style.width   = netHealth + '%';
+
+        document.getElementById('powerPercent').textContent = Math.round(powerHealth) + '%';
+        document.getElementById('bankPercent').textContent  = Math.round(bankHealth) + '%';
+        document.getElementById('airPercent').textContent   = Math.round(airHealth) + '%';
+        document.getElementById('netPercent').textContent   = Math.round(netHealth) + '%';
+
+        updateBarColor('.system-bar-fill.power', powerHealth);
+        updateBarColor('.system-bar-fill.bank', bankHealth);
+        updateBarColor('.system-bar-fill.air', airHealth);
+        updateBarColor('.system-bar-fill.net', netHealth);
+      }
+
+      function updateBarColor(selector, health) {
+        const bar = document.querySelector(selector);
+        let bgColor, glowColor;
+
+        if (health > 66) {
+          bgColor = '#00ff00';
+          glowColor = '#00ff00';
+        } else if (health > 33) {
+          bgColor = '#ffff00';
+          glowColor = '#ffff00';
+        } else {
+          bgColor = '#ff3333';
+          glowColor = '#ff3333';
+        }
+
+        bar.style.backgroundColor = bgColor;
+        bar.style.boxShadow = `0 0 10px ${glowColor}`;
+      }
+
+      // ============= TEXT AUTO-FIT (MAX SIZE BUT ALWAYS FITS) =============
+      function fitGuestCardText(card) {
+        const info = card.querySelector('.guest-info');
+        const charEl = card.querySelector('.guest-character');
+        const realEl = card.querySelector('.guest-real-name');
+        if (!info || !charEl || !realEl) return;
+
+        let charSize = 26;
+        let realSize = 18;
+
+        const charMin = 10;
+        const realMin = 8;
+
+        charEl.style.fontSize = charSize + 'px';
+        realEl.style.fontSize = realSize + 'px';
+
+        for (let i = 0; i < 200; i++) {
+          const fitsHeight = info.scrollHeight <= info.clientHeight;
+          const charFitsWidth = charEl.scrollWidth <= charEl.clientWidth;
+          const realFitsWidth = realEl.scrollWidth <= realEl.clientWidth;
+
+          if (fitsHeight && charFitsWidth && realFitsWidth) break;
+
+          const charOverflow = charEl.scrollWidth - charEl.clientWidth;
+          const realOverflow = realEl.scrollWidth - realEl.clientWidth;
+
+          const shouldShrinkChar =
+            (charOverflow > realOverflow && charSize > charMin) || realSize <= realMin;
+
+          if (shouldShrinkChar && charSize > charMin) {
+            charSize -= 0.5;
+            charEl.style.fontSize = charSize + 'px';
+          } else if (realSize > realMin) {
+            realSize -= 0.5;
+            realEl.style.fontSize = realSize + 'px';
+          } else if (charSize > charMin) {
+            charSize -= 0.5;
+            charEl.style.fontSize = charSize + 'px';
+          } else {
+            break;
+          }
         }
       }
 
-      const charEl = card.querySelector('.guest-character');
-      const realEl = card.querySelector('.guest-real-name');
-
-      if (charEl) charEl.textContent = guest.character_name;
-      if (realEl) realEl.textContent = guest.real_name;
-
-      requestAnimationFrame(() => fitGuestCardText(card));
-
-      if (animate) setTimeout(() => card.classList.remove('pulse'), 1600);
-    }
-
-    async function syncGuests({ animateNew = false } = {}) {
-      const rows = await fetchAssignedGuests();
-
-      rows.forEach((guest) => {
-        if (!guest.character_name || !guest.real_name) return;
-        if (guestMap.size >= CONFIG.MAX_GUESTS && !guestMap.has(guest.character_name)) return;
-
-        const prev = guestMap.get(guest.character_name);
-        const isNew = !prev;
-
-        // Store latest
-        guestMap.set(guest.character_name, guest);
-
-        // Render new or update
-        renderOrUpdateGuestCard(guest, { animate: animateNew && isNew });
+      window.addEventListener('resize', () => {
+        document.querySelectorAll('.guest-card').forEach(fitGuestCardText);
       });
-    }
 
-    function setupRealtime() {
-      const channel = supabase
-        .channel('guests-live')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'guests' },
-          (payload) => {
-            const g = payload.new;
+      // ============= SUPABASE SYNC (REALTIME + POLL FALLBACK) =============
+      async function fetchAssignedGuests() {
+        const { data, error } = await sbClient
+          .from('guests')
+          .select('*')
+          .not('real_name', 'is', null)
+          .order('created_at', { ascending: true });
 
-            if (CONFIG.DEBUG) {
-              console.log('[Realtime] event:', payload.eventType, 'new:', g);
-            }
-
-            if (!g || !g.character_name || !g.real_name) return;
-            if (guestMap.size >= CONFIG.MAX_GUESTS && !guestMap.has(g.character_name)) return;
-
-            const wasMissing = !guestMap.has(g.character_name);
-            guestMap.set(g.character_name, g);
-            renderOrUpdateGuestCard(g, { animate: wasMissing });
-          }
-        )
-        .subscribe((status) => {
-          console.log('[Realtime status]', status);
-        });
-
-      return channel;
-    }
-
-    // ============= RIGHT PANEL ROTATION =============
-    function renderRightPanel() {
-      const guests = Array.from(guestMap.values());
-      const container = document.getElementById('rightPanelContent');
-      const oldItem = container.querySelector('.panel-item');
-      if (oldItem) {
-        oldItem.classList.add('hidden');
-        setTimeout(() => oldItem.remove(), 800);
+        if (error) throw error;
+        return data || [];
       }
 
-      const newItem = document.createElement('div');
-      newItem.className = 'panel-item';
+      function safeId(str) {
+        return String(str || '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+      }
 
-      if (rightPanelMode === 'spotlight' && guests.length > 0) {
-        const guest = guests[rightPanelIndex % guests.length];
-        newItem.innerHTML = `
-          <div class="spotlight">
-            <div class="spotlight-name">${escapeHTML(guest.character_name)}</div>
-            <div class="spotlight-title">${escapeHTML(guest.character_title || 'Mystery Guest')}</div>
-            <div class="spotlight-desc">${escapeHTML(guest.character_description || 'No description')}</div>
-            <div class="spotlight-underline"></div>
-          </div>
-        `;
-        rightPanelIndex++;
-      } else {
-        newItem.innerHTML = `
-          <div class="ticker-wrapper">
-            <div class="ticker">
-              <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
-              <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
-              <span class="ticker-item"><span class="ticker-symbol">Napster</span><span class="ticker-alert">Lawsuit Pending</span></span>
-              <span class="ticker-item"><span class="ticker-symbol">Y2K Bug Risk</span><span class="ticker-critical">CRITICAL</span></span>
-              <span class="ticker-item"><span class="ticker-symbol">ARE WE READY?</span><span class="ticker-question">???</span></span>
-              <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
-              <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
+      function escapeHTML(text) {
+        const div = document.createElement('div');
+        div.textContent = text ?? '';
+        return div.innerHTML;
+      }
+
+      function renderOrUpdateGuestCard(guest, { animate = false } = {}) {
+        if (!guest || !guest.character_name || !guest.real_name) return;
+
+        const wall = document.getElementById('photoWall');
+        const id = `guest-${safeId(guest.character_name)}`;
+        let card = document.getElementById(id);
+
+        const imageHTML = guest.photo_url
+          ? `<img src="${guest.photo_url}" alt="${escapeHTML(guest.character_name)}" class="guest-image" onerror="this.style.display='none'">`
+          : '';
+
+        if (!card) {
+          card = document.createElement('div');
+          card.id = id;
+          card.className = 'guest-card' + (animate ? ' pulse' : '');
+          card.innerHTML = `
+            ${imageHTML}
+            <div class="guest-info">
+              <div class="guest-character">${escapeHTML(guest.character_name)}</div>
+              <div class="guest-real-name">${escapeHTML(guest.real_name)}</div>
             </div>
-          </div>
-        `;
+          `;
+          wall.appendChild(card);
+
+          requestAnimationFrame(() => fitGuestCardText(card));
+
+          if (animate) setTimeout(() => card.classList.remove('pulse'), 1600);
+          return;
+        }
+
+        card.classList.toggle('pulse', animate);
+
+        const existingImg = card.querySelector('img.guest-image');
+        if (guest.photo_url) {
+          if (!existingImg) {
+            card.insertAdjacentHTML('afterbegin', imageHTML);
+          } else if (existingImg.src !== guest.photo_url) {
+            existingImg.src = guest.photo_url;
+          }
+        }
+
+        const charEl = card.querySelector('.guest-character');
+        const realEl = card.querySelector('.guest-real-name');
+        if (charEl) charEl.textContent = guest.character_name;
+        if (realEl) realEl.textContent = guest.real_name;
+
+        requestAnimationFrame(() => fitGuestCardText(card));
+
+        if (animate) setTimeout(() => card.classList.remove('pulse'), 1600);
       }
 
-      container.appendChild(newItem);
-      rightPanelMode = rightPanelMode === 'spotlight' ? 'ticker' : 'spotlight';
-    }
+      async function syncGuests({ animateNew = false } = {}) {
+        const rows = await fetchAssignedGuests();
 
-    // ============= INIT =============
-    async function init() {
-      updateCountdown();
+        rows.forEach((guest) => {
+          if (!guest.character_name || !guest.real_name) return;
+          if (guestMap.size >= CONFIG.MAX_GUESTS && !guestMap.has(guest.character_name)) return;
 
-      try {
-        // Initial load
-        await syncGuests({ animateNew: false });
+          const prev = guestMap.get(guest.character_name);
+          const isNew = !prev;
 
-        // Realtime (best)
-        setupRealtime();
-
-        // Fallback polling (guarantees updates even if realtime is blocked)
-        setInterval(() => {
-          syncGuests({ animateNew: true }).catch((e) => console.warn('[Poll sync error]', e));
-        }, CONFIG.POLL_FALLBACK_MS);
-
-      } catch (e) {
-        console.error('Init error:', e);
+          guestMap.set(guest.character_name, guest);
+          renderOrUpdateGuestCard(guest, { animate: animateNew && isNew });
+        });
       }
 
-      renderRightPanel();
-      setInterval(updateCountdown, 1000);
-      setInterval(renderRightPanel, CONFIG.ROTATION_INTERVAL_MS);
-    }
+      function setupRealtime() {
+        sbClient
+          .channel('guests-live')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'guests' },
+            (payload) => {
+              const g = payload.new;
 
-    init();
+              if (CONFIG.DEBUG) {
+                console.log('[Realtime] event:', payload.eventType, g);
+              }
+
+              if (!g || !g.character_name || !g.real_name) return;
+              if (guestMap.size >= CONFIG.MAX_GUESTS && !guestMap.has(g.character_name)) return;
+
+              const wasMissing = !guestMap.has(g.character_name);
+              guestMap.set(g.character_name, g);
+              renderOrUpdateGuestCard(g, { animate: wasMissing });
+            }
+          )
+          .subscribe((status) => console.log('[Realtime status]', status));
+      }
+
+      // ============= RIGHT PANEL ROTATION =============
+      function renderRightPanel() {
+        const guests = Array.from(guestMap.values());
+        const container = document.getElementById('rightPanelContent');
+        const oldItem = container.querySelector('.panel-item');
+        if (oldItem) {
+          oldItem.classList.add('hidden');
+          setTimeout(() => oldItem.remove(), 800);
+        }
+
+        const newItem = document.createElement('div');
+        newItem.className = 'panel-item';
+
+        if (rightPanelMode === 'spotlight' && guests.length > 0) {
+          const guest = guests[rightPanelIndex % guests.length];
+          newItem.innerHTML = `
+            <div class="spotlight">
+              <div class="spotlight-name">${escapeHTML(guest.character_name)}</div>
+              <div class="spotlight-title">${escapeHTML(guest.character_title || 'Mystery Guest')}</div>
+              <div class="spotlight-desc">${escapeHTML(guest.character_description || 'No description')}</div>
+              <div class="spotlight-underline"></div>
+            </div>
+          `;
+          rightPanelIndex++;
+        } else {
+          newItem.innerHTML = `
+            <div class="ticker-wrapper">
+              <div class="ticker">
+                <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">Napster</span><span class="ticker-alert">Lawsuit Pending</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">Y2K Bug Risk</span><span class="ticker-critical">CRITICAL</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">ARE WE READY?</span><span class="ticker-question">???</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">MusicNetHub</span><span class="ticker-change up">▲32%</span></span>
+                <span class="ticker-item"><span class="ticker-symbol">Sterling Soundscapes</span><span class="ticker-change down">▼12%</span></span>
+              </div>
+            </div>
+          `;
+        }
+
+        container.appendChild(newItem);
+        rightPanelMode = rightPanelMode === 'spotlight' ? 'ticker' : 'spotlight';
+      }
+
+      // ============= INIT =============
+      async function init() {
+        updateCountdown();
+
+        try {
+          await syncGuests({ animateNew: false });
+          setupRealtime();
+
+          // Poll fallback (keeps working even if realtime is blocked)
+          setInterval(() => {
+            syncGuests({ animateNew: true }).catch((e) => console.warn('[Poll sync error]', e));
+          }, CONFIG.POLL_FALLBACK_MS);
+
+        } catch (e) {
+          console.error('Init error:', e);
+        }
+
+        renderRightPanel();
+        setInterval(updateCountdown, 1000);
+        setInterval(renderRightPanel, CONFIG.ROTATION_INTERVAL_MS);
+      }
+
+      init();
+    })();
   </script>
 </body>
 </html>
