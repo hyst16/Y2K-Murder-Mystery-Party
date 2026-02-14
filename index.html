@@ -6,11 +6,7 @@
     <title>Y2K Murder Mystery Party — Control Room</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
 
@@ -35,10 +31,7 @@
             flex-direction: column;
         }
 
-        @keyframes fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
         /* ============= TOP BAND (260px) ============= */
         .top-band {
@@ -139,7 +132,7 @@
             font-size: 72px;
             font-weight: 900;
             color: var(--neon-pink);
-            text-shadow: 
+            text-shadow:
                 0 0 10px var(--neon-pink),
                 0 0 20px var(--neon-pink),
                 0 0 40px var(--magenta);
@@ -198,12 +191,9 @@
         .eq-bar:nth-child(19) { animation-delay: 1.44s; animation-duration: 0.68s; height: 22px; }
         .eq-bar:nth-child(20) { animation-delay: 1.52s; animation-duration: 0.62s; height: 15px; }
 
-        @keyframes eq-dance {
-            0%, 100% { transform: scaleY(1); }
-            50% { transform: scaleY(2.2); }
-        }
+        @keyframes eq-dance { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(2.2); } }
 
-        /* --- TOP RIGHT: ROTATING PANEL (Spotlight / Stock Ticker) --- */
+        /* --- TOP RIGHT: ROTATING PANEL --- */
         .right-panel {
             display: flex;
             flex-direction: column;
@@ -232,14 +222,8 @@
             animation: fade-in 0.8s ease-in-out forwards;
         }
 
-        .panel-item.hidden {
-            animation: fade-out 0.8s ease-in-out forwards;
-        }
-
-        @keyframes fade-out {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
+        .panel-item.hidden { animation: fade-out 0.8s ease-in-out forwards; }
+        @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
 
         .spotlight {
             display: flex;
@@ -280,10 +264,7 @@
             animation: underline-pulse 2s ease-in-out infinite;
         }
 
-        @keyframes underline-pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
+        @keyframes underline-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .ticker-wrapper {
             position: relative;
@@ -301,68 +282,17 @@
             will-change: transform;
         }
 
-        .ticker-item {
-            white-space: nowrap;
-            font-family: 'Orbitron', monospace;
-            font-size: 13px;
-            color: var(--text-light);
-        }
+        .ticker-item { white-space: nowrap; font-family: 'Orbitron', monospace; font-size: 13px; color: var(--text-light); }
+        .ticker-symbol { color: var(--neon-pink); font-weight: 700; margin-right: 8px; }
+        .ticker-change { font-size: 12px; font-weight: 700; margin-left: 4px; }
+        .ticker-change.up { color: #00ff00; text-shadow: 0 0 8px #00ff00; }
+        .ticker-change.down { color: #ff3333; text-shadow: 0 0 8px #ff3333; }
+        .ticker-alert { color: var(--magenta); font-size: 11px; margin-left: 4px; text-shadow: 0 0 8px var(--magenta); }
+        .ticker-critical { color: #ff0000; font-size: 11px; font-weight: 700; margin-left: 4px; text-shadow: 0 0 12px #ff0000; animation: critical-pulse 1s ease-in-out infinite; }
+        .ticker-question { color: var(--purple); font-size: 12px; font-weight: 900; margin-left: 4px; text-shadow: 0 0 10px var(--purple); }
 
-        .ticker-symbol {
-            color: var(--neon-pink);
-            font-weight: 700;
-            margin-right: 8px;
-        }
-
-        .ticker-change {
-            font-size: 12px;
-            font-weight: 700;
-            margin-left: 4px;
-        }
-
-        .ticker-change.up {
-            color: #00ff00;
-            text-shadow: 0 0 8px #00ff00;
-        }
-
-        .ticker-change.down {
-            color: #ff3333;
-            text-shadow: 0 0 8px #ff3333;
-        }
-
-        .ticker-alert {
-            color: var(--magenta);
-            font-size: 11px;
-            margin-left: 4px;
-            text-shadow: 0 0 8px var(--magenta);
-        }
-
-        .ticker-critical {
-            color: #ff0000;
-            font-size: 11px;
-            font-weight: 700;
-            margin-left: 4px;
-            text-shadow: 0 0 12px #ff0000;
-            animation: critical-pulse 1s ease-in-out infinite;
-        }
-
-        .ticker-question {
-            color: var(--purple);
-            font-size: 12px;
-            font-weight: 900;
-            margin-left: 4px;
-            text-shadow: 0 0 10px var(--purple);
-        }
-
-        @keyframes critical-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        @keyframes ticker-scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        @keyframes critical-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         /* ============= PHOTO WALL (2 rows × 10 cards) ============= */
         .photo-wall {
@@ -391,40 +321,20 @@
             position: relative;
         }
 
-        .guest-card.pulse {
-            animation: card-pulse-glow 1.2s ease-out forwards;
-        }
+        .guest-card.pulse { animation: card-pulse-glow 1.2s ease-out forwards; }
 
         @keyframes card-pulse-glow {
-            0% {
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 16, 240, 0.6);
-            }
-            50% {
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 16, 240, 0.9);
-            }
-            100% {
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.15);
-            }
+            0% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 16, 240, 0.6); }
+            50% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 16, 240, 0.9); }
+            100% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 217, 255, 0.15); }
         }
 
         @keyframes card-slide-in {
-            from {
-                opacity: 0;
-                transform: perspective(1000px) rotateZ(-1deg) translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: perspective(1000px) rotateZ(-1deg) translateY(0);
-            }
+            from { opacity: 0; transform: perspective(1000px) rotateZ(-1deg) translateY(40px); }
+            to { opacity: 1; transform: perspective(1000px) rotateZ(-1deg) translateY(0); }
         }
 
-        .guest-image {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-            background: #000;
-            display: block;
-        }
+        .guest-image { width: 100%; height: auto; object-fit: contain; background: #000; display: block; }
 
         .guest-info {
             padding: 12px 8px;
@@ -454,19 +364,14 @@
             margin-top: 2px;
         }
 
-        .hidden {
-            display: none;
-        }
-
-        ::-webkit-scrollbar {
-            display: none;
-        }
+        .hidden { display: none; }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
     <!-- TOP BAND -->
     <div class="top-band">
-        <!-- LEFT: System Stability -->
+        <!-- LEFT -->
         <div class="system-stability">
             <div class="system-label">Y2K SYSTEM STABILITY</div>
             <div class="system-bar-container">
@@ -491,36 +396,20 @@
             </div>
         </div>
 
-        <!-- CENTER: Countdown & Equalizer -->
+        <!-- CENTER -->
         <div class="center-panel">
             <div class="countdown-title">DJ NEON'S MILLENNIUM COUNTDOWN</div>
             <div class="countdown" id="countdown">00:00:00</div>
             <div class="countdown-label">TILL MILLENNIUM</div>
             <div class="equalizer">
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
-                <div class="eq-bar"></div>
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
             </div>
         </div>
 
-        <!-- RIGHT: Rotating Panel -->
+        <!-- RIGHT -->
         <div class="right-panel">
             <div class="right-panel-content" id="rightPanelContent"></div>
         </div>
@@ -532,17 +421,19 @@
     <script>
         // ============= CONFIGURATION =============
         const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
-        
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubGdlaHVkZXN4emhtZXViYnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTU2NDIsImV4cCI6MjA4NjU5MTY0Mn0.xYfDMQn--cCi_npbfrFR297WFaE4A8zxQBME68KBNp0';
+
         const CONFIG = {
             COUNTDOWN_TARGET_TIME: { hours: 22, minutes: 0, seconds: 0 },
             MAX_GUESTS: 20,
             ROTATION_INTERVAL_MS: 10000,
         };
 
-        // Initialize Supabase
+        // Initialize Supabase (guarded)
         const { createClient } = window.supabase;
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        var supabase = window.__supabaseIndexClient || (
+            window.__supabaseIndexClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        );
 
         // ============= STATE =============
         let guestMap = new Map();
@@ -555,10 +446,10 @@
             const target = new Date();
             target.setHours(CONFIG.COUNTDOWN_TARGET_TIME.hours, CONFIG.COUNTDOWN_TARGET_TIME.minutes, CONFIG.COUNTDOWN_TARGET_TIME.seconds, 0);
             if (now > target) target.setDate(target.getDate() + 1);
-            
+
             const diff = Math.max(0, target - now);
             const totalSeconds = diff / 1000;
-            
+
             const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
             const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
             const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
@@ -569,9 +460,9 @@
 
         function updateSystemBars(totalSeconds) {
             const CRITICAL_THRESHOLD = 2.5 * 3600;
-            
+
             let healthPercent = totalSeconds > CRITICAL_THRESHOLD ? 100 : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
-            
+
             const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
             const bankHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.12);
             const airHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.18);
@@ -596,7 +487,7 @@
         function updateBarColor(selector, health) {
             const bar = document.querySelector(selector);
             let bgColor, glowColor;
-            
+
             if (health > 66) {
                 bgColor = '#00ff00';
                 glowColor = '#00ff00';
@@ -607,7 +498,7 @@
                 bgColor = '#ff3333';
                 glowColor = '#ff3333';
             }
-            
+
             bar.style.backgroundColor = bgColor;
             bar.style.boxShadow = `0 0 10px ${glowColor}`;
         }
@@ -615,19 +506,17 @@
         // ============= SUPABASE REAL-TIME SYNC =============
         async function initializeGuests() {
             try {
-                // Initial fetch - get all guests with real names assigned
                 const { data, error } = await supabase
                     .from('guests')
                     .select('*')
                     .not('real_name', 'is', null)
-                    .order('created_at', { ascending: true });
+                    .order('id', { ascending: true });  // FIXED: was created_at
 
                 if (error) {
                     console.error('Fetch error:', error);
                     return;
                 }
 
-                // Load initial guests
                 data.forEach(guest => {
                     if (guest.character_name && guest.real_name) {
                         guestMap.set(guest.character_name, guest);
@@ -635,20 +524,17 @@
                     }
                 });
 
-                // Set up real-time subscription
                 supabase
                     .channel('guests')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, (payload) => {
                         const guest = payload.new;
                         if (guest && guest.character_name && guest.real_name) {
-                            // Check if new guest
                             if (!guestMap.has(guest.character_name)) {
                                 guestMap.set(guest.character_name, guest);
                                 if (guestMap.size <= CONFIG.MAX_GUESTS) {
                                     renderNewGuest(guest);
                                 }
                             } else {
-                                // Update existing guest
                                 guestMap.set(guest.character_name, guest);
                             }
                         }
@@ -663,11 +549,11 @@
         function renderNewGuest(guest) {
             const card = document.createElement('div');
             card.className = 'guest-card pulse';
-            
-            const imageHTML = guest.photo_url ? 
-                `<img src="${guest.photo_url}" alt="${guest.character_name}" class="guest-image" onerror="this.style.display='none'">` 
+
+            const imageHTML = guest.photo_url
+                ? `<img src="${guest.photo_url}" alt="${guest.character_name}" class="guest-image" onerror="this.style.display='none'">`
                 : '';
-            
+
             card.innerHTML = `
                 ${imageHTML}
                 <div class="guest-info">
@@ -729,7 +615,6 @@
             rightPanelMode = rightPanelMode === 'spotlight' ? 'ticker' : 'spotlight';
         }
 
-        // ============= INITIALIZATION & LOOPS =============
         function init() {
             updateCountdown();
             initializeGuests();
