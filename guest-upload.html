@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Join the Y2K Party!</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
+
+        html, body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a0a3a 100%);
+            color: #f0f0f0;
+            font-family: 'Audiowide', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(10, 14, 39, 0.95);
+            border: 2px solid #00d9ff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(0, 217, 255, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff10f0;
+            text-shadow: 0 0 15px #ff10f0;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d9ff;
+            text-shadow: 0 0 8px #00d9ff;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', monospace;
+        }
+
+        select, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00d9ff;
+            border-radius: 6px;
+            color: #f0f0f0;
+            font-family: 'Audiowide', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        select:focus, input[type="text"]:focus, input[type="file"]:focus {
+            outline: none;
+            background: rgba(0, 217, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        input[type="file"] {
+            cursor: pointer;
+            padding: 12px;
+        }
+
+        .preview {
+            margin-top: 12px;
+            text-align: center;
+            min-height: 40px;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 250px;
+            border: 2px solid #ff10f0;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255, 16, 240, 0.4);
+        }
+
+        .character-info {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            display: none;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .character-info.show {
+            display: block;
+        }
+
+        .char-title {
+            color: #ff10f0;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .char-desc {
+            color: #00d9ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00d9ff, #00ffff);
+            color: #0a0e27;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.5);
+            margin-top: 8px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px rgba(0, 217, 255, 0.7);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 13px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            display: block;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .message.error {
+            background: rgba(255, 51, 51, 0.2);
+            color: #ff3333;
+            border: 2px solid #ff3333;
+            display: block;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #00d9ff;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 217, 255, 0.3);
+            border-top: 3px solid #00d9ff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* CELEBRATORY ANIMATION */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+            z-index: 9999;
+        }
+
+        .celebration.show {
+            display: block;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff10f0;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        .confetti.cyan {
+            background: #00d9ff;
+        }
+
+        .confetti.purple {
+            background: #9d00ff;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .success-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', monospace;
+            font-size: 36px;
+            font-weight: 900;
+            color: #ff10f0;
+            text-shadow: 0 0 30px #ff10f0;
+            z-index: 10000;
+            animation: success-pop 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes success-pop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -150%) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 18px;
+            }
+
+            label {
+                font-size: 12px;
+            }
+
+            select, input[type="text"], input[type="file"] {
+                padding: 13px;
+                font-size: 16px;
+                border-radius: 5px;
+            }
+
+            button {
+                padding: 14px;
+                font-size: 15px;
+                letter-spacing: 1px;
+            }
+
+            .preview img {
+                max-height: 200px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .container {
+                max-width: 95vw;
+            }
+
+            .preview img {
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 JOIN THE PARTY</h1>
+        
+        <form id="guestForm">
+            <div class="form-group">
+                <label for="characterSelect">Pick Your Character *</label>
+                <select id="characterSelect" required>
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div class="character-info" id="characterInfo">
+                <div class="char-title" id="charTitle"></div>
+                <div class="char-desc" id="charDesc"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="realName">Your Name *</label>
+                <input type="text" id="realName" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="photoFile">Your Photo *</label>
+                <input type="file" id="photoFile" accept="image/*" capture="user" required>
+                <div class="preview" id="preview"></div>
+            </div>
+
+            <button type="submit">📸 ADD ME TO THE WALL</button>
+            <div class="loading" id="loading"><span class="spinner"></span>Uploading...</div>
+            <div class="message" id="message"></div>
+        </form>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
+
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('guestForm');
+        const characterSelect = document.getElementById('characterSelect');
+        const realNameInput = document.getElementById('realName');
+        const photoInput = document.getElementById('photoFile');
+        const preview = document.getElementById('preview');
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+        const characterInfo = document.getElementById('characterInfo');
+        const celebration = document.getElementById('celebration');
+
+        let charactersMap = {};
+
+        async function loadCharacters() {
+            try {
+                const { data, error } = await supabase
+                    .from('guests')
+                    .select('character_name, character_title, character_description');
+
+                if (error) throw error;
+                
+                while (characterSelect.options.length > 1) {
+                    characterSelect.remove(1);
+                }
+
+                data.forEach(char => {
+                    const option = document.createElement('option');
+                    option.value = char.character_name;
+                    option.textContent = char.character_name;
+                    characterSelect.appendChild(option);
+                    
+                    charactersMap[char.character_name] = {
+                        title: char.character_title,
+                        description: char.character_description
+                    };
+                });
+            } catch (error) {
+                console.error('Error loading characters:', error);
+                message.textContent = `Error: ${error.message}`;
+                message.classList.add('error');
+            }
+        }
+
+        characterSelect.addEventListener('change', (e) => {
+            const selectedName = e.target.value;
+            if (selectedName && charactersMap[selectedName]) {
+                document.getElementById('charTitle').textContent = charactersMap[selectedName].title;
+                document.getElementById('charDesc').textContent = charactersMap[selectedName].description;
+                characterInfo.classList.add('show');
+            } else {
+                characterInfo.classList.remove('show');
+            }
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    preview.innerHTML = `<img src="${event.target.result}" alt="preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function createConfetti() {
+            const colors = ['', 'cyan', 'purple'];
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = `confetti ${colors[Math.floor(Math.random() * colors.length)]}`;
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.delay = Math.random() * 0.2 + 's';
+                celebration.appendChild(confetti);
+            }
+        }
+
+        function showCelebration(realName) {
+            celebration.classList.add('show');
+            createConfetti();
+
+            const successText = document.createElement('div');
+            successText.className = 'success-text';
+            successText.textContent = '🎉 YES!';
+            document.body.appendChild(successText);
+
+            setTimeout(() => {
+                celebration.classList.remove('show');
+                celebration.innerHTML = '';
+                successText.remove();
+            }, 2500);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loading.classList.add('show');
+            message.classList.remove('success', 'error');
+
+            try {
+                const characterName = characterSelect.value;
+                const realName = realNameInput.value;
+                const photoFile = photoInput.files[0];
+
+                if (!characterName || !realName || !photoFile) {
+                    throw new Error('Fill in all fields');
+                }
+
+                const fileName = `${Date.now()}-${photoFile.name}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('photos')
+                    .upload(fileName, photoFile);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('photos')
+                    .getPublicUrl(fileName);
+
+                const { error: dbError } = await supabase
+                    .from('guests')
+                    .update({
+                        real_name: realName,
+                        photo_url: publicUrl,
+                    })
+                    .eq('character_name', characterName);
+
+                if (dbError) throw dbError;
+
+                showCelebration(realName);
+                
+                setTimeout(() => {
+                    message.textContent = `✅ You're on the wall as ${characterName}!`;
+                    message.classList.add('success');
+                    form.reset();
+                    preview.innerHTML = '';
+                    characterInfo.classList.remove('show');
+                }, 2500);
+            } catch (error) {
+                message.textContent = `❌ ${error.message}`;
+                message.classList.add('error');
+                console.error('Error:', error);
+            } finally {
+                loading.classList.remove('show');
+            }
+        });
+
+        loadCharacters();
+    </script>
+</body>
+</html>
