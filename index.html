@@ -4,35 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Y2K Murder Mystery Party — Control Room</title>
+
+  <!-- Supabase client (browser) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
 
-    /**********************************************************************
-     * ======================= TV TUNING CONTROLS =========================
-     * These are the MAIN knobs you’ll tweak most often.
-     *
-     * 1) Layout / spacing:
-     *    - --hud-padding: moves top band content inward (prevents TV edge cutoff)
-     *    - --top-band-height: makes the whole top band taller/shorter
-     *    - --left-col-min / --center-col-min / --right-col-min:
-     *        minimum widths for the 3 top columns.
-     *        The key difference vs before: columns can EXPAND beyond minimums.
-     *    - --center-weight / --right-weight:
-     *        how much extra width center/right receive on big screens.
-     *
-     * 2) Readability scaling:
-     *    - countdown sizes
-     *    - system stability font sizes
-     *    - spotlight + ticker font sizes
-     *
-     * 3) Countdown glow:
-     *    - --countdown-glow-1/2/3 and --countdown-glow-alpha
-     **********************************************************************/
     :root{
-      /* Colors */
       --bg-dark: #0a0e27;
       --cyan: #00d9ff;
       --magenta: #ff006e;
@@ -41,25 +22,43 @@
       --neon-blue: #00ffff;
       --text-light: #f0f0f0;
 
-      /* ===================== 1) LAYOUT / SPACING ===================== */
-      --hud-padding: 40px;         /* Increase if TV cuts off edges */
-      --top-band-height: 420px;    /* Make top area taller/shorter */
-      --top-band-gap: 30px;        /* Space between left/center/right columns */
+      /**********************************************************************
+       * ===================== TV MODE: EASY TO TUNE ========================
+       *
+       * If stuff is too close to the TV edge, increase --hud-padding.
+       * If the top band feels cramped, increase --top-band-height.
+       **********************************************************************/
+      --hud-padding: 40px;          /* outer padding inside the top band */
+      --top-band-height: 420px;     /* height of the top band */
 
-      /* Column minimums (these are NOT caps; they expand on wide screens) */
-      --left-col-min: 520px;       /* System Stability column min width */
-      --center-col-min: 640px;     /* Countdown column min width */
-      --right-col-min: 620px;      /* Spotlight+Ticker column min width */
+      /**********************************************************************
+       * ===================== COLUMN LAYOUT (IMPORTANT) ====================
+       *
+       * ✅ FIX FOR YOUR "STACKED ROWS" BUG:
+       *    DO NOT use calc(... * 1fr). CSS can’t multiply fr units.
+       *    Instead: define fr values directly like 1.35fr and use them.
+       *
+       * You now have BOTH:
+       *  - MIN WIDTHS (so each column stays readable)
+       *  - FR WEIGHTS (so columns can expand when there is extra space)
+       *
+       * HOW TO TUNE:
+       *  - Make LEFT wider:   increase --left-fr or --left-col-min
+       *  - Make CENTER bigger: increase --center-fr or --center-col-min
+       *  - Make RIGHT wider:  increase --right-fr or --right-col-min
+       **********************************************************************/
+      --left-col-min: 520px;        /* minimum width for system stability column */
+      --center-col-min: 520px;      /* minimum width for countdown column */
+      --right-col-min: 520px;       /* minimum width for spotlight+ticker column */
 
-      /* Column expansion weights on wide screens */
-      --center-weight: 1.35;       /* Give center more of the extra width */
-      --right-weight: 1.15;        /* Give right a bit more than left */
+      --left-fr: 1.25fr;            /* how “greedy” the LEFT column is */
+      --center-fr: 1.60fr;          /* how “greedy” the CENTER column is */
+      --right-fr: 1.35fr;           /* how “greedy” the RIGHT column is */
 
-      /* ===================== 2) READABILITY SCALING ===================== */
-      --countdown-font: 132px;
+      /* readable scaling */
+      --countdown-font: 132px;      /* BIG for TV */
       --countdown-title: 30px;
       --countdown-label: 20px;
-      --countdown-letter-spacing: 6px;
 
       --stability-title: 40px;
       --stability-label: 35px;
@@ -72,15 +71,13 @@
       --ticker-height: 54px;
       --ticker-font: 35px;
 
-      /* Optional: widen label/percent blocks to use the new space */
-      --stability-label-width: 90px;    /* was 55px */
-      --stability-percent-width: 80px;  /* was 52px */
-
-      /* ===================== 3) COUNTDOWN GLOW CONTROL ===================== */
-      --countdown-glow-1: 10px;    /* closest glow radius */
-      --countdown-glow-2: 22px;    /* mid glow radius */
-      --countdown-glow-3: 45px;    /* far glow radius */
-      --countdown-glow-alpha: 1;   /* 1 = full, 0.7 = softer, etc */
+      /**********************************************************************
+       * Countdown glow tuning:
+       * Increase the blur/spread numbers below to make glow stronger.
+       **********************************************************************/
+      --countdown-glow-1: 10px;
+      --countdown-glow-2: 22px;
+      --countdown-glow-3: 45px;
     }
 
     body {
@@ -100,23 +97,30 @@
     .top-band {
       display: grid;
 
-      /* IMPORTANT: Columns are min widths + expand with screen width */
+      /**********************************************************************
+       * ✅ THIS IS THE FIX.
+       * We use valid minmax() + fr variables.
+       *
+       * DO NOT DO THIS (INVALID):
+       *   calc(var(--center-weight) * 1fr)
+       *
+       * DO THIS (VALID):
+       *   --center-fr: 1.60fr
+       **********************************************************************/
       grid-template-columns:
-        minmax(var(--left-col-min), 1fr)
-        minmax(var(--center-col-min), calc(var(--center-weight) * 1fr))
-        minmax(var(--right-col-min), calc(var(--right-weight) * 1fr));
+        minmax(var(--left-col-min), var(--left-fr))
+        minmax(var(--center-col-min), var(--center-fr))
+        minmax(var(--right-col-min), var(--right-fr));
 
-      gap: var(--top-band-gap);
+      gap: 30px;
       padding: var(--hud-padding);
       background: linear-gradient(180deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 10, 58, 0.9) 100%);
       border-bottom: 2px solid var(--cyan);
       box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
       height: var(--top-band-height);
       flex-shrink: 0;
+      align-items: center; /* helps prevent weird vertical stretching */
     }
-
-    /* Prevent grid children from refusing to shrink/grow naturally */
-    .system-stability, .center-panel, .right-panel { min-width: 0; }
 
     /* --- TOP LEFT: SYSTEM STABILITY --- */
     .system-stability {
@@ -126,6 +130,7 @@
       align-items: flex-start;
       gap: 14px;
       padding-right: 10px;
+      width: 100%;
     }
 
     .system-label {
@@ -149,7 +154,7 @@
     .system-bar-label {
       font-size: var(--stability-label);
       color: var(--magenta);
-      width: var(--stability-label-width);
+      width: 90px; /* tweak if labels wrap */
       text-transform: uppercase;
       font-weight: 900;
       letter-spacing: 1px;
@@ -165,7 +170,6 @@
       border-radius: 3px;
       overflow: hidden;
       position: relative;
-      min-width: 0;
     }
 
     .system-bar-fill {
@@ -178,7 +182,7 @@
     .system-bar-percent {
       font-size: var(--stability-percent);
       color: var(--cyan);
-      width: var(--stability-percent-width);
+      width: 72px;
       text-align: right;
       font-weight: 900;
       font-family: 'Orbitron', monospace;
@@ -193,7 +197,7 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      text-align: center;
+      width: 100%;
     }
 
     .countdown-title {
@@ -204,6 +208,7 @@
       color: var(--cyan);
       text-shadow: 0 0 16px var(--cyan);
       text-transform: uppercase;
+      text-align: center;
     }
 
     .countdown {
@@ -211,14 +216,14 @@
       font-size: var(--countdown-font);
       font-weight: 900;
       color: var(--neon-pink);
-      letter-spacing: var(--countdown-letter-spacing);
-      line-height: 1;
-
-      /* Glow strength controlled by vars above */
       text-shadow:
-        0 0 var(--countdown-glow-1) rgba(255, 16, 240, var(--countdown-glow-alpha)),
-        0 0 var(--countdown-glow-2) rgba(255, 16, 240, var(--countdown-glow-alpha)),
-        0 0 var(--countdown-glow-3) rgba(255, 0, 110, calc(var(--countdown-glow-alpha) * 0.9));
+        0 0 var(--countdown-glow-1) var(--neon-pink),
+        0 0 var(--countdown-glow-2) var(--neon-pink),
+        0 0 var(--countdown-glow-3) var(--magenta);
+      letter-spacing: 6px;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
     }
 
     .countdown-label {
@@ -229,6 +234,7 @@
       text-shadow: 0 0 12px var(--cyan);
       margin-top: -10px;
       text-transform: uppercase;
+      text-align: center;
     }
 
     /* EQUALIZER */
@@ -285,6 +291,7 @@
       gap: 14px;
       justify-content: center;
       align-items: stretch;
+      width: 100%;
     }
 
     .spotlight-box {
@@ -298,6 +305,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      width: 100%;
     }
 
     .spotlight {
@@ -361,7 +369,7 @@
       align-items: center;
       box-shadow: 0 0 18px rgba(0, 217, 255, 0.12);
       padding: 0 12px;
-      min-width: 0;
+      width: 100%;
     }
 
     .ticker {
@@ -557,26 +565,23 @@
   <script>
     /**********************************************************************
      * ===================== SUPER OBVIOUS CONFIG =========================
-     *
-     * A) SET YOUR COUNTDOWN TARGET TIME HERE
-     *    - hours is 0–23 (military time)
-     *    - Example: 22:00:00 means 10:00 PM
+     * 1) SET YOUR COUNTDOWN TARGET TIME HERE
      **********************************************************************/
     const COUNTDOWN_TARGET_TIME = { hours: 22, minutes: 0, seconds: 0 }; // <-- EDIT THIS
 
     /**********************************************************************
-     * B) SUPABASE CONNECTION
+     * 2) SUPABASE CONNECTION
      *    (Make sure this is your ANON key, NOT service_role)
      **********************************************************************/
     const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
 
     /**********************************************************************
-     * C) BEHAVIOR TUNING
+     * 3) BEHAVIOR
      **********************************************************************/
     const CONFIG = {
       MAX_GUESTS: 20,
-      SPOTLIGHT_ROTATE_MS: 15000, // rotates checked-in guests
+      SPOTLIGHT_ROTATE_MS: 15000,
     };
 
     // ---- Prevent "Identifier 'supabase' already declared" issues ----
@@ -608,7 +613,6 @@
 
     function updateSystemBars(totalSeconds) {
       const CRITICAL_THRESHOLD = 2.5 * 3600;
-
       let healthPercent = totalSeconds > CRITICAL_THRESHOLD ? 100 : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
 
       const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
@@ -670,7 +674,6 @@
       document.querySelectorAll('.guest-count').forEach(el => el.textContent = String(count));
     }
 
-    // Auto-fit text inside polaroid label area
     function fitText(el, maxPx, minPx) {
       if (!el) return;
       el.style.whiteSpace = 'nowrap';
