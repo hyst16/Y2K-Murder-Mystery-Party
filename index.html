@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Y2K Murder Mystery Party — Control Room</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -240,7 +241,6 @@
             to { opacity: 0; }
         }
 
-        /* Spotlight Mode */
         .spotlight {
             display: flex;
             flex-direction: column;
@@ -285,7 +285,6 @@
             50% { opacity: 1; }
         }
 
-        /* Stock Ticker Mode */
         .ticker-wrapper {
             position: relative;
             width: 100%;
@@ -455,7 +454,6 @@
             margin-top: 2px;
         }
 
-        /* ============= UTILITIES ============= */
         .hidden {
             display: none;
         }
@@ -532,19 +530,26 @@
     <div class="photo-wall" id="photoWall"></div>
 
     <script>
+        // ============= CONFIGURATION =============
+        const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
+        
         const CONFIG = {
-            SHEET_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR2-PvhqluJKo9Fg8Oxx9t5GlTvA9zv8bUm1DVHVnlc_4R2T2Jdtip1hmUVJvHI6Ik6T69VT_Bn270R/pub?output=csv',
-            POLL_INTERVAL_MS: 5000,
-            ROTATION_INTERVAL_MS: 10000,
-            PHOTO_BASE_PATH: './photos/',
             COUNTDOWN_TARGET_TIME: { hours: 22, minutes: 0, seconds: 0 },
             MAX_GUESTS: 20,
+            ROTATION_INTERVAL_MS: 10000,
         };
 
+        // Initialize Supabase
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============= STATE =============
         let guestMap = new Map();
         let rightPanelMode = 'spotlight';
         let rightPanelIndex = 0;
 
+        // ============= COUNTDOWN LOGIC =============
         function updateCountdown() {
             const now = new Date();
             const target = new Date();
@@ -559,42 +564,29 @@
             const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
             document.getElementById('countdown').textContent = `${hours}:${minutes}:${seconds}`;
 
-            // Update system bars based on remaining time
             updateSystemBars(totalSeconds);
         }
 
         function updateSystemBars(totalSeconds) {
-            // Stay at 100% health until 2.5 hours remaining
-            const CRITICAL_THRESHOLD = 2.5 * 3600; // 2.5 hours in seconds
+            const CRITICAL_THRESHOLD = 2.5 * 3600;
             
-            let healthPercent;
-            if (totalSeconds > CRITICAL_THRESHOLD) {
-                // Stay at 100% until we hit 2.5 hours
-                healthPercent = 100;
-            } else {
-                // Degrade from 100% to 0% over the final 2.5 hours
-                healthPercent = Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
-            }
+            let healthPercent = totalSeconds > CRITICAL_THRESHOLD ? 100 : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
             
-            // Each system degrades differently with some variance
             const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
             const bankHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.12);
             const airHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.18);
             const netHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.1);
 
-            // Update bar widths
             document.querySelector('.system-bar-fill.power').style.width = powerHealth + '%';
             document.querySelector('.system-bar-fill.bank').style.width = bankHealth + '%';
             document.querySelector('.system-bar-fill.air').style.width = airHealth + '%';
             document.querySelector('.system-bar-fill.net').style.width = netHealth + '%';
 
-            // Update percentages
             document.getElementById('powerPercent').textContent = Math.round(powerHealth) + '%';
             document.getElementById('bankPercent').textContent = Math.round(bankHealth) + '%';
             document.getElementById('airPercent').textContent = Math.round(airHealth) + '%';
             document.getElementById('netPercent').textContent = Math.round(netHealth) + '%';
 
-            // Update glow color based on health (green -> yellow -> red)
             updateBarColor('.system-bar-fill.power', powerHealth);
             updateBarColor('.system-bar-fill.bank', bankHealth);
             updateBarColor('.system-bar-fill.air', airHealth);
@@ -606,13 +598,13 @@
             let bgColor, glowColor;
             
             if (health > 66) {
-                bgColor = '#00ff00'; // Green
+                bgColor = '#00ff00';
                 glowColor = '#00ff00';
             } else if (health > 33) {
-                bgColor = '#ffff00'; // Yellow
+                bgColor = '#ffff00';
                 glowColor = '#ffff00';
             } else {
-                bgColor = '#ff3333'; // Red
+                bgColor = '#ff3333';
                 glowColor = '#ff3333';
             }
             
@@ -620,58 +612,72 @@
             bar.style.boxShadow = `0 0 10px ${glowColor}`;
         }
 
-        async function fetchGuestData() {
+        // ============= SUPABASE REAL-TIME SYNC =============
+        async function initializeGuests() {
             try {
-                const cacheBuster = new Date().getTime();
-                const url = `${CONFIG.SHEET_CSV_URL}&t=${cacheBuster}`;
-                const response = await fetch(url);
-                const csv = await response.text();
-                parseCSV(csv);
-            } catch (error) {
-                console.error('Fetch failed:', error);
-            }
-        }
+                // Initial fetch - get all guests with real names assigned
+                const { data, error } = await supabase
+                    .from('guests')
+                    .select('*')
+                    .not('real_name', 'is', null)
+                    .order('created_at', { ascending: true });
 
-        function parseCSV(csv) {
-            const lines = csv.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            const charNameIdx = headers.indexOf('CharacterName');
-            const titleIdx = headers.indexOf('CharacterTitle');
-            const descIdx = headers.indexOf('CharacterDescription');
-            const realNameIdx = headers.indexOf('RealName');
-            const photoIdx = headers.indexOf('PhotoURL');
-
-            for (let i = 1; i < lines.length; i++) {
-                const row = lines[i].split(',').map(cell => cell.trim());
-                const charName = row[charNameIdx]?.trim();
-                const title = row[titleIdx]?.trim();
-                const description = row[descIdx]?.trim();
-                const realName = row[realNameIdx]?.trim();
-                const photoURL = row[photoIdx]?.trim();
-
-                if (charName && realName && photoURL && !guestMap.has(charName)) {
-                    guestMap.set(charName, { charName, title, description, realName, photoURL, rendered: false });
-                    if (guestMap.size <= CONFIG.MAX_GUESTS) renderNewGuest(charName);
+                if (error) {
+                    console.error('Fetch error:', error);
+                    return;
                 }
+
+                // Load initial guests
+                data.forEach(guest => {
+                    if (guest.character_name && guest.real_name) {
+                        guestMap.set(guest.character_name, guest);
+                        renderNewGuest(guest);
+                    }
+                });
+
+                // Set up real-time subscription
+                supabase
+                    .channel('guests')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, (payload) => {
+                        const guest = payload.new;
+                        if (guest && guest.character_name && guest.real_name) {
+                            // Check if new guest
+                            if (!guestMap.has(guest.character_name)) {
+                                guestMap.set(guest.character_name, guest);
+                                if (guestMap.size <= CONFIG.MAX_GUESTS) {
+                                    renderNewGuest(guest);
+                                }
+                            } else {
+                                // Update existing guest
+                                guestMap.set(guest.character_name, guest);
+                            }
+                        }
+                    })
+                    .subscribe();
+
+            } catch (error) {
+                console.error('Initialization error:', error);
             }
         }
 
-        function renderNewGuest(charName) {
-            const guest = guestMap.get(charName);
-            if (!guest) return;
+        function renderNewGuest(guest) {
             const card = document.createElement('div');
             card.className = 'guest-card pulse';
+            
+            const imageHTML = guest.photo_url ? 
+                `<img src="${guest.photo_url}" alt="${guest.character_name}" class="guest-image" onerror="this.style.display='none'">` 
+                : '';
+            
             card.innerHTML = `
-                <img src="${CONFIG.PHOTO_BASE_PATH}${guest.photoURL}" alt="${guest.charName}" class="guest-image" onerror="this.style.display='none'">
+                ${imageHTML}
                 <div class="guest-info">
                     <div>
-                        <div class="guest-character">${escapeHTML(guest.charName)}</div>
-                        <div class="guest-real-name">${escapeHTML(guest.realName)}</div>
+                        <div class="guest-character">${escapeHTML(guest.character_name)}</div>
+                        <div class="guest-real-name">${escapeHTML(guest.real_name)}</div>
                     </div>
                 </div>
             `;
             document.getElementById('photoWall').appendChild(card);
-            guest.rendered = true;
         }
 
         function escapeHTML(text) {
@@ -681,7 +687,7 @@
         }
 
         function renderRightPanel() {
-            const guests = Array.from(guestMap.values()).filter(g => g.rendered);
+            const guests = Array.from(guestMap.values());
             const container = document.getElementById('rightPanelContent');
             const oldItem = container.querySelector('.panel-item');
             if (oldItem) {
@@ -696,9 +702,9 @@
                 const guest = guests[rightPanelIndex % guests.length];
                 newItem.innerHTML = `
                     <div class="spotlight">
-                        <div class="spotlight-name">${escapeHTML(guest.charName)}</div>
-                        <div class="spotlight-title">${escapeHTML(guest.title || 'Mystery Guest')}</div>
-                        <div class="spotlight-desc">${escapeHTML(guest.description || 'No description')}</div>
+                        <div class="spotlight-name">${escapeHTML(guest.character_name)}</div>
+                        <div class="spotlight-title">${escapeHTML(guest.character_title || 'Mystery Guest')}</div>
+                        <div class="spotlight-desc">${escapeHTML(guest.character_description || 'No description')}</div>
                         <div class="spotlight-underline"></div>
                     </div>
                 `;
@@ -723,12 +729,13 @@
             rightPanelMode = rightPanelMode === 'spotlight' ? 'ticker' : 'spotlight';
         }
 
+        // ============= INITIALIZATION & LOOPS =============
         function init() {
             updateCountdown();
-            fetchGuestData();
+            initializeGuests();
             renderRightPanel();
+
             setInterval(updateCountdown, 1000);
-            setInterval(fetchGuestData, CONFIG.POLL_INTERVAL_MS);
             setInterval(renderRightPanel, CONFIG.ROTATION_INTERVAL_MS);
         }
 
