@@ -244,13 +244,8 @@
             animation: confetti-fall 3s ease-out forwards;
         }
 
-        .confetti.cyan {
-            background: #00d9ff;
-        }
-
-        .confetti.purple {
-            background: #9d00ff;
-        }
+        .confetti.cyan { background: #00d9ff; }
+        .confetti.purple { background: #9d00ff; }
 
         @keyframes confetti-fall {
             to {
@@ -275,71 +270,31 @@
         }
 
         @keyframes success-pop {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
-                opacity: 1;
-            }
-            80% {
-                opacity: 1;
-            }
-            100% {
-                transform: translate(-50%, -150%) scale(1.2);
-                opacity: 0;
-            }
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translate(-50%, -150%) scale(1.2); opacity: 0; }
         }
 
-        /* Mobile optimization */
         @media (max-width: 600px) {
-            body {
-                padding: 15px;
-            }
-
-            .container {
-                padding: 20px;
-                border-radius: 10px;
-            }
-
-            h1 {
-                font-size: 24px;
-                margin-bottom: 18px;
-            }
-
-            label {
-                font-size: 12px;
-            }
-
-            select, input[type="text"], input[type="file"] {
-                padding: 13px;
-                font-size: 16px;
-                border-radius: 5px;
-            }
-
-            button {
-                padding: 14px;
-                font-size: 15px;
-                letter-spacing: 1px;
-            }
-
-            .preview img {
-                max-height: 200px;
-            }
+            body { padding: 15px; }
+            .container { padding: 20px; border-radius: 10px; }
+            h1 { font-size: 24px; margin-bottom: 18px; }
+            label { font-size: 12px; }
+            select, input[type="text"], input[type="file"] { padding: 13px; font-size: 16px; border-radius: 5px; }
+            button { padding: 14px; font-size: 15px; letter-spacing: 1px; }
+            .preview img { max-height: 200px; }
         }
 
         @media (max-height: 700px) {
-            .container {
-                max-width: 95vw;
-            }
-
-            .preview img {
-                max-height: 150px;
-            }
+            .container { max-width: 95vw; }
+            .preview img { max-height: 150px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎭 JOIN THE PARTY</h1>
-        
+
         <form id="guestForm">
             <div class="form-group">
                 <label for="characterSelect">Pick Your Character *</label>
@@ -377,7 +332,11 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubGdlaHVkZXN4emhtZXViYnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwMTU2NDIsImV4cCI6MjA4NjU5MTY0Mn0.xYfDMQn--cCi_npbfrFR297WFaE4A8zxQBME68KBNp0';
 
         const { createClient } = window.supabase;
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Guarded init (prevents "already declared" issues if scripts are evaluated twice)
+        var supabase = window.__supabaseGuestUploadClient || (
+            window.__supabaseGuestUploadClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        );
 
         const form = document.getElementById('guestForm');
         const characterSelect = document.getElementById('characterSelect');
@@ -395,10 +354,11 @@
             try {
                 const { data, error } = await supabase
                     .from('guests')
-                    .select('character_name, character_title, character_description');
+                    .select('character_name, character_title, character_description')
+                    .order('character_name', { ascending: true });
 
                 if (error) throw error;
-                
+
                 while (characterSelect.options.length > 1) {
                     characterSelect.remove(1);
                 }
@@ -408,7 +368,7 @@
                     option.value = char.character_name;
                     option.textContent = char.character_name;
                     characterSelect.appendChild(option);
-                    
+
                     charactersMap[char.character_name] = {
                         title: char.character_title,
                         description: char.character_description
@@ -417,6 +377,7 @@
             } catch (error) {
                 console.error('Error loading characters:', error);
                 message.textContent = `Error: ${error.message}`;
+                message.classList.remove('success');
                 message.classList.add('error');
             }
         }
@@ -424,8 +385,8 @@
         characterSelect.addEventListener('change', (e) => {
             const selectedName = e.target.value;
             if (selectedName && charactersMap[selectedName]) {
-                document.getElementById('charTitle').textContent = charactersMap[selectedName].title;
-                document.getElementById('charDesc').textContent = charactersMap[selectedName].description;
+                document.getElementById('charTitle').textContent = charactersMap[selectedName].title || '';
+                document.getElementById('charDesc').textContent = charactersMap[selectedName].description || '';
                 characterInfo.classList.add('show');
             } else {
                 characterInfo.classList.remove('show');
@@ -449,12 +410,12 @@
                 const confetti = document.createElement('div');
                 confetti.className = `confetti ${colors[Math.floor(Math.random() * colors.length)]}`;
                 confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.delay = Math.random() * 0.2 + 's';
+                confetti.style.animationDelay = (Math.random() * 0.2) + 's'; // FIXED
                 celebration.appendChild(confetti);
             }
         }
 
-        function showCelebration(realName) {
+        function showCelebration() {
             celebration.classList.add('show');
             createConfetti();
 
@@ -477,7 +438,7 @@
 
             try {
                 const characterName = characterSelect.value;
-                const realName = realNameInput.value;
+                const realName = realNameInput.value.trim();
                 const photoFile = photoInput.files[0];
 
                 if (!characterName || !realName || !photoFile) {
@@ -485,15 +446,19 @@
                 }
 
                 const fileName = `${Date.now()}-${photoFile.name}`;
+
                 const { error: uploadError } = await supabase.storage
                     .from('photos')
                     .upload(fileName, photoFile);
 
                 if (uploadError) throw uploadError;
 
-                const { data: { publicUrl } } = supabase.storage
+                const { data: publicData } = supabase.storage
                     .from('photos')
                     .getPublicUrl(fileName);
+
+                const publicUrl = publicData?.publicUrl;
+                if (!publicUrl) throw new Error('Could not generate public URL for uploaded photo');
 
                 const { error: dbError } = await supabase
                     .from('guests')
@@ -505,8 +470,8 @@
 
                 if (dbError) throw dbError;
 
-                showCelebration(realName);
-                
+                showCelebration();
+
                 setTimeout(() => {
                     message.textContent = `✅ You're on the wall as ${characterName}!`;
                     message.classList.add('success');
@@ -514,6 +479,7 @@
                     preview.innerHTML = '';
                     characterInfo.classList.remove('show');
                 }, 2500);
+
             } catch (error) {
                 message.textContent = `❌ ${error.message}`;
                 message.classList.add('error');
