@@ -13,7 +13,12 @@
 
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
 
+    /**********************************************************************
+     * ========================= TUNE THESE (TV) ==========================
+     * These are the easiest knobs to tweak without breaking layout.
+     **********************************************************************/
     :root{
+      /* Theme */
       --bg-dark: #0a0e27;
       --cyan: #00d9ff;
       --magenta: #ff006e;
@@ -22,62 +27,42 @@
       --neon-blue: #00ffff;
       --text-light: #f0f0f0;
 
-      /**********************************************************************
-       * ===================== TV MODE: EASY TO TUNE ========================
-       *
-       * If stuff is too close to the TV edge, increase --hud-padding.
-       * If the top band feels cramped, increase --top-band-height.
-       **********************************************************************/
-      --hud-padding: 40px;          /* outer padding inside the top band */
+      /* Layout */
+      --hud-padding: 40px;          /* padding around the whole top band */
       --top-band-height: 420px;     /* height of the top band */
 
-      /**********************************************************************
-       * ===================== COLUMN LAYOUT (IMPORTANT) ====================
-       *
-       * ✅ FIX FOR YOUR "STACKED ROWS" BUG:
-       *    DO NOT use calc(... * 1fr). CSS can’t multiply fr units.
-       *    Instead: define fr values directly like 1.35fr and use them.
-       *
-       * You now have BOTH:
-       *  - MIN WIDTHS (so each column stays readable)
-       *  - FR WEIGHTS (so columns can expand when there is extra space)
-       *
-       * HOW TO TUNE:
-       *  - Make LEFT wider:   increase --left-fr or --left-col-min
-       *  - Make CENTER bigger: increase --center-fr or --center-col-min
-       *  - Make RIGHT wider:  increase --right-fr or --right-col-min
-       **********************************************************************/
-      --left-col-min: 520px;        /* minimum width for system stability column */
-      --center-col-min: 520px;      /* minimum width for countdown column */
-      --right-col-min: 520px;       /* minimum width for spotlight+ticker column */
+      /* Left/Right column width.
+         If you want the left “System Stability” and right “Spotlight/Ticker”
+         to be WIDER, increase this number. */
+      --side-col-width: 560px;      /* <-- WIDEN LEFT/RIGHT HERE */
 
-      --left-fr: 1.25fr;            /* how “greedy” the LEFT column is */
-      --center-fr: 1.60fr;          /* how “greedy” the CENTER column is */
-      --right-fr: 1.35fr;           /* how “greedy” the RIGHT column is */
-
-      /* readable scaling */
-      --countdown-font: 132px;      /* BIG for TV */
+      /* Countdown sizing */
+      --countdown-font: 132px;      /* big pink digits */
       --countdown-title: 30px;
       --countdown-label: 20px;
 
+      /* Countdown glow (lower = more readable) */
+      --glow1: 5px;                 /* subtle close glow */
+      --glow2: 10px;                /* mid glow */
+      --glow3: 18px;                /* far glow */
+
+      /* System Stability sizing */
       --stability-title: 40px;
       --stability-label: 35px;
       --stability-percent: 30px;
 
+      /* Spotlight sizing */
       --spotlight-name: 40px;
       --spotlight-title: 35px;
       --spotlight-desc: 30px;
 
+      /* Ticker sizing */
       --ticker-height: 54px;
       --ticker-font: 35px;
 
-      /**********************************************************************
-       * Countdown glow tuning:
-       * Increase the blur/spread numbers below to make glow stronger.
-       **********************************************************************/
-      --countdown-glow-1: 10px;
-      --countdown-glow-2: 22px;
-      --countdown-glow-3: 45px;
+      /* Polaroid name sizes (these are MAX sizes; JS auto-fits down if needed) */
+      --polaroid-character-max: 30px; /* <-- MAKE BIGGER/SMALLER HERE */
+      --polaroid-realname-max: 18px;  /* <-- MAKE BIGGER/SMALLER HERE */
     }
 
     body {
@@ -97,20 +82,9 @@
     .top-band {
       display: grid;
 
-      /**********************************************************************
-       * ✅ THIS IS THE FIX.
-       * We use valid minmax() + fr variables.
-       *
-       * DO NOT DO THIS (INVALID):
-       *   calc(var(--center-weight) * 1fr)
-       *
-       * DO THIS (VALID):
-       *   --center-fr: 1.60fr
-       **********************************************************************/
-      grid-template-columns:
-        minmax(var(--left-col-min), var(--left-fr))
-        minmax(var(--center-col-min), var(--center-fr))
-        minmax(var(--right-col-min), var(--right-fr));
+      /* IMPORTANT: fixed side width so left/right can widen.
+         Center uses the remaining space. */
+      grid-template-columns: var(--side-col-width) 1fr var(--side-col-width);
 
       gap: 30px;
       padding: var(--hud-padding);
@@ -119,7 +93,7 @@
       box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
       height: var(--top-band-height);
       flex-shrink: 0;
-      align-items: center; /* helps prevent weird vertical stretching */
+      align-items: center;
     }
 
     /* --- TOP LEFT: SYSTEM STABILITY --- */
@@ -147,14 +121,14 @@
     .system-bar-container {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       width: 100%;
     }
 
     .system-bar-label {
       font-size: var(--stability-label);
       color: var(--magenta);
-      width: 90px; /* tweak if labels wrap */
+      width: 90px;
       text-transform: uppercase;
       font-weight: 900;
       letter-spacing: 1px;
@@ -164,12 +138,13 @@
 
     .system-bar {
       flex: 1;
-      height: 12px;
+      height: 14px;
       background: rgba(0, 255, 0, 0.15);
       border: 1px solid rgba(0, 255, 0, 0.3);
       border-radius: 3px;
       overflow: hidden;
       position: relative;
+      min-width: 0;
     }
 
     .system-bar-fill {
@@ -182,7 +157,7 @@
     .system-bar-percent {
       font-size: var(--stability-percent);
       color: var(--cyan);
-      width: 72px;
+      width: 84px;
       text-align: right;
       font-weight: 900;
       font-family: 'Orbitron', monospace;
@@ -198,6 +173,7 @@
       justify-content: center;
       gap: 16px;
       width: 100%;
+      min-width: 0;
     }
 
     .countdown-title {
@@ -216,10 +192,13 @@
       font-size: var(--countdown-font);
       font-weight: 900;
       color: var(--neon-pink);
+
+      /* Reduced glow for readability */
       text-shadow:
-        0 0 var(--countdown-glow-1) var(--neon-pink),
-        0 0 var(--countdown-glow-2) var(--neon-pink),
-        0 0 var(--countdown-glow-3) var(--magenta);
+        0 0 var(--glow1) var(--neon-pink),
+        0 0 var(--glow2) var(--neon-pink),
+        0 0 var(--glow3) var(--magenta);
+
       letter-spacing: 6px;
       line-height: 1;
       text-align: center;
@@ -471,7 +450,7 @@
       font-family: 'Orbitron', monospace;
       font-weight: 900;
       color: var(--neon-pink);
-      line-height: 1.15;
+      line-height: 1.12;
       text-shadow: none;
     }
 
@@ -525,6 +504,7 @@
       <div class="countdown-title">DJ NEON'S MILLENNIUM COUNTDOWN</div>
       <div class="countdown" id="countdown">00:00:00</div>
       <div class="countdown-label">TILL MILLENNIUM</div>
+
       <div class="equalizer" aria-hidden="true">
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
         <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
@@ -566,31 +546,44 @@
     /**********************************************************************
      * ===================== SUPER OBVIOUS CONFIG =========================
      * 1) SET YOUR COUNTDOWN TARGET TIME HERE
+     *    - This is a daily countdown to the next time today (or tomorrow).
      **********************************************************************/
     const COUNTDOWN_TARGET_TIME = { hours: 22, minutes: 0, seconds: 0 }; // <-- EDIT THIS
 
     /**********************************************************************
      * 2) SUPABASE CONNECTION
-     *    (Make sure this is your ANON key, NOT service_role)
+     *    - Use your ANON key here (NOT service_role)
      **********************************************************************/
     const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
 
     /**********************************************************************
-     * 3) BEHAVIOR
+     * 3) BEHAVIOR SETTINGS
      **********************************************************************/
     const CONFIG = {
       MAX_GUESTS: 20,
-      SPOTLIGHT_ROTATE_MS: 15000,
+      SPOTLIGHT_ROTATE_MS: 15000,  // spotlight rotates through checked-in guests
+    };
+
+    /**********************************************************************
+     * 4) POLAROID TEXT AUTO-FIT SETTINGS (BIG TEXT)
+     *    - These are MAX sizes; text shrinks down automatically if needed.
+     **********************************************************************/
+    const POLAROID_TEXT = {
+      CHARACTER_MAX: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--polaroid-character-max')) || 30,
+      CHARACTER_MIN: 12,
+      REALNAME_MAX: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--polaroid-realname-max')) || 18,
+      REALNAME_MIN: 10,
     };
 
     // ---- Prevent "Identifier 'supabase' already declared" issues ----
     const { createClient } = window.supabase;
-    const sb = window.__y2kSupabaseClient || (window.__y2kSupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
+    const sb = window.__y2kSupabaseClient
+      || (window.__y2kSupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY));
 
     // ============= STATE =============
-    const guestMap = new Map();     // key: character_name -> guest row
-    const cardMap  = new Map();     // key: character_name -> DOM element
+    const guestMap = new Map(); // key: character_name -> latest row
+    const cardMap  = new Map(); // key: character_name -> DOM element
     let spotlightIndex = 0;
 
     // ============= COUNTDOWN LOGIC =============
@@ -612,7 +605,8 @@
     }
 
     function updateSystemBars(totalSeconds) {
-      const CRITICAL_THRESHOLD = 2.5 * 3600;
+      const CRITICAL_THRESHOLD = 2.5 * 3600; // 2.5 hours
+
       let healthPercent = totalSeconds > CRITICAL_THRESHOLD ? 100 : Math.max(0, (totalSeconds / CRITICAL_THRESHOLD) * 100);
 
       const powerHealth = Math.max(0, healthPercent - (100 - healthPercent) * 0.15);
@@ -660,6 +654,7 @@
     }
 
     function getCheckedInGuestsSorted() {
+      // Only guests with real_name count as "checked in"
       const guests = Array.from(guestMap.values()).filter(g => g && g.real_name);
       guests.sort((a, b) => {
         const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
@@ -674,6 +669,7 @@
       document.querySelectorAll('.guest-count').forEach(el => el.textContent = String(count));
     }
 
+    // Auto-fit text inside polaroid label area (BIG text but always fits)
     function fitText(el, maxPx, minPx) {
       if (!el) return;
       el.style.whiteSpace = 'nowrap';
@@ -683,6 +679,7 @@
       let size = maxPx;
       el.style.fontSize = size + 'px';
 
+      // Reduce until it fits width
       while (size > minPx && el.scrollWidth > el.clientWidth) {
         size -= 1;
         el.style.fontSize = size + 'px';
@@ -692,8 +689,10 @@
     function fitPolaroidText(card) {
       const nameEl = card.querySelector('.guest-character');
       const realEl = card.querySelector('.guest-real-name');
-      fitText(nameEl, 18, 10);
-      fitText(realEl, 13, 9);
+
+      // BIG default sizes (then shrink down if needed)
+      fitText(nameEl, POLAROID_TEXT.CHARACTER_MAX, POLAROID_TEXT.CHARACTER_MIN);
+      fitText(realEl, POLAROID_TEXT.REALNAME_MAX, POLAROID_TEXT.REALNAME_MIN);
     }
 
     // ============= PHOTO WALL RENDERING =============
@@ -710,14 +709,15 @@
       card.innerHTML = `
         ${imageHTML}
         <div class="guest-info">
-          <div class="guest-character">${escapeHTML(guest.character_name)}</div>
-          <div class="guest-real-name">${escapeHTML(guest.real_name)}</div>
+          <div class="guest-character">${escapeHTML(guest.character_name || '')}</div>
+          <div class="guest-real-name">${escapeHTML(guest.real_name || '')}</div>
         </div>
       `;
 
       photoWall.appendChild(card);
       cardMap.set(guest.character_name, card);
 
+      // Fit text after it’s in DOM
       requestAnimationFrame(() => fitPolaroidText(card));
     }
 
@@ -730,6 +730,7 @@
       if (nameEl) nameEl.textContent = guest.character_name ?? '';
       if (realEl) realEl.textContent = guest.real_name ?? '';
 
+      // Update/add image if needed
       const img = card.querySelector('img.guest-image');
       if (guest.photo_url) {
         if (img) {
@@ -745,6 +746,33 @@
       }
 
       requestAnimationFrame(() => fitPolaroidText(card));
+    }
+
+    /**********************************************************************
+     * ===================== REALTIME CARD FIX =============================
+     * This is the bug you described:
+     * - Sometimes "real_name" is saved first
+     * - and "photo_url" arrives slightly later in a separate UPDATE
+     * If the card doesn't exist yet, we MUST create it when either:
+     *   (A) real_name becomes non-null  OR
+     *   (B) photo_url becomes non-null
+     * (as long as they are "checked in" = has real_name)
+     **********************************************************************/
+    function ensureCardForCheckedInGuest(guest, isNewPulse = false) {
+      if (!guest || !guest.character_name) return;
+      if (!guest.real_name) return; // we only display checked-in guests
+
+      const alreadyHasCard = cardMap.has(guest.character_name);
+
+      if (!alreadyHasCard) {
+        // Only render if we still have room
+        const currentCount = getCheckedInGuestsSorted().length;
+        if (currentCount <= CONFIG.MAX_GUESTS) {
+          renderNewGuest(guest, { isNew: isNewPulse });
+        }
+      } else {
+        updateExistingGuestCard(guest);
+      }
     }
 
     // ============= SPOTLIGHT (always visible) =============
@@ -780,6 +808,7 @@
     // ============= SUPABASE REALTIME + INITIAL LOAD =============
     async function initializeGuests() {
       try {
+        // Initial fetch: checked-in guests only
         const { data, error } = await sb
           .from('guests')
           .select('*')
@@ -791,6 +820,7 @@
           return;
         }
 
+        // Load initial guests (no pulse for existing)
         data.slice(0, CONFIG.MAX_GUESTS).forEach(guest => {
           if (guest?.character_name && guest?.real_name) {
             guestMap.set(guest.character_name, guest);
@@ -801,26 +831,42 @@
         updateGuestCountTicker();
         renderSpotlight();
 
+        // Real-time subscription
         sb
           .channel('guests-realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, (payload) => {
             const guest = payload.new;
+            const oldRow = payload.old;
+
             if (!guest || !guest.character_name) return;
 
-            const wasCheckedIn = !!guestMap.get(guest.character_name)?.real_name;
+            // previous + current state
+            const prev = guestMap.get(guest.character_name) || oldRow || {};
+            const wasCheckedIn = !!prev.real_name;
             const isCheckedIn  = !!guest.real_name;
 
+            // Store latest row no matter what
             guestMap.set(guest.character_name, guest);
 
+            // If they JUST checked in (real_name null -> value), pulse and ensure card
             if (!wasCheckedIn && isCheckedIn) {
-              const currentCount = getCheckedInGuestsSorted().length;
-              if (currentCount <= CONFIG.MAX_GUESTS && !cardMap.has(guest.character_name)) {
-                renderNewGuest(guest, { isNew: true });
-              } else if (cardMap.has(guest.character_name)) {
-                updateExistingGuestCard(guest);
+              ensureCardForCheckedInGuest(guest, true);
+              updateGuestCountTicker();
+              renderSpotlight();
+              return;
+            }
+
+            // If already checked in:
+            // IMPORTANT FIX: If their photo_url arrives later (or changes), make sure a card exists and updates.
+            if (isCheckedIn) {
+              const photoJustArrived = !prev.photo_url && !!guest.photo_url;
+              const photoChanged = !!guest.photo_url && prev.photo_url !== guest.photo_url;
+              const nameChanged = (prev.real_name !== guest.real_name) || (prev.character_name !== guest.character_name);
+
+              if (photoJustArrived || photoChanged || nameChanged) {
+                // If card didn’t exist yet, create it now (this fixes your “refresh needed” bug)
+                ensureCardForCheckedInGuest(guest, photoJustArrived);
               }
-            } else if (isCheckedIn && cardMap.has(guest.character_name)) {
-              updateExistingGuestCard(guest);
             }
 
             updateGuestCountTicker();
@@ -839,8 +885,11 @@
       updateCountdown();
       initializeGuests();
 
+      // loops
       setInterval(updateCountdown, 1000);
       setInterval(renderSpotlight, CONFIG.SPOTLIGHT_ROTATE_MS);
+
+      // keep ticker count fresh even if nothing else triggers
       setInterval(updateGuestCountTicker, 5000);
     }
 
