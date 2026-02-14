@@ -8,10 +8,31 @@
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap');
 
+    /**********************************************************************
+     * ======================= TV TUNING CONTROLS =========================
+     * These are the MAIN knobs you’ll tweak most often.
+     *
+     * 1) Layout / spacing:
+     *    - --hud-padding: moves top band content inward (prevents TV edge cutoff)
+     *    - --top-band-height: makes the whole top band taller/shorter
+     *    - --left-col-min / --center-col-min / --right-col-min:
+     *        minimum widths for the 3 top columns.
+     *        The key difference vs before: columns can EXPAND beyond minimums.
+     *    - --center-weight / --right-weight:
+     *        how much extra width center/right receive on big screens.
+     *
+     * 2) Readability scaling:
+     *    - countdown sizes
+     *    - system stability font sizes
+     *    - spotlight + ticker font sizes
+     *
+     * 3) Countdown glow:
+     *    - --countdown-glow-1/2/3 and --countdown-glow-alpha
+     **********************************************************************/
     :root{
+      /* Colors */
       --bg-dark: #0a0e27;
       --cyan: #00d9ff;
       --magenta: #ff006e;
@@ -20,15 +41,25 @@
       --neon-blue: #00ffff;
       --text-light: #f0f0f0;
 
-      /* ============ TV MODE CONTROLS (EASY TO TUNE) ============ */
-      --hud-padding: 40px;          /* requested */
-      --top-band-height: 420px;     /* requested */
-      --side-col-width: 480px;      /* makes left/right wider */
+      /* ===================== 1) LAYOUT / SPACING ===================== */
+      --hud-padding: 40px;         /* Increase if TV cuts off edges */
+      --top-band-height: 420px;    /* Make top area taller/shorter */
+      --top-band-gap: 30px;        /* Space between left/center/right columns */
 
-      /* readable scaling */
-      --countdown-font: 132px;      /* BIG for TV */
+      /* Column minimums (these are NOT caps; they expand on wide screens) */
+      --left-col-min: 520px;       /* System Stability column min width */
+      --center-col-min: 640px;     /* Countdown column min width */
+      --right-col-min: 620px;      /* Spotlight+Ticker column min width */
+
+      /* Column expansion weights on wide screens */
+      --center-weight: 1.35;       /* Give center more of the extra width */
+      --right-weight: 1.15;        /* Give right a bit more than left */
+
+      /* ===================== 2) READABILITY SCALING ===================== */
+      --countdown-font: 132px;
       --countdown-title: 30px;
       --countdown-label: 20px;
+      --countdown-letter-spacing: 6px;
 
       --stability-title: 40px;
       --stability-label: 35px;
@@ -40,6 +71,16 @@
 
       --ticker-height: 54px;
       --ticker-font: 35px;
+
+      /* Optional: widen label/percent blocks to use the new space */
+      --stability-label-width: 90px;    /* was 55px */
+      --stability-percent-width: 80px;  /* was 52px */
+
+      /* ===================== 3) COUNTDOWN GLOW CONTROL ===================== */
+      --countdown-glow-1: 10px;    /* closest glow radius */
+      --countdown-glow-2: 22px;    /* mid glow radius */
+      --countdown-glow-3: 45px;    /* far glow radius */
+      --countdown-glow-alpha: 1;   /* 1 = full, 0.7 = softer, etc */
     }
 
     body {
@@ -58,8 +99,14 @@
     /* ============= TOP BAND (TV MODE) ============= */
     .top-band {
       display: grid;
-      grid-template-columns: var(--side-col-width) 1fr var(--side-col-width);
-      gap: 30px;
+
+      /* IMPORTANT: Columns are min widths + expand with screen width */
+      grid-template-columns:
+        minmax(var(--left-col-min), 1fr)
+        minmax(var(--center-col-min), calc(var(--center-weight) * 1fr))
+        minmax(var(--right-col-min), calc(var(--right-weight) * 1fr));
+
+      gap: var(--top-band-gap);
       padding: var(--hud-padding);
       background: linear-gradient(180deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 10, 58, 0.9) 100%);
       border-bottom: 2px solid var(--cyan);
@@ -67,6 +114,9 @@
       height: var(--top-band-height);
       flex-shrink: 0;
     }
+
+    /* Prevent grid children from refusing to shrink/grow naturally */
+    .system-stability, .center-panel, .right-panel { min-width: 0; }
 
     /* --- TOP LEFT: SYSTEM STABILITY --- */
     .system-stability {
@@ -99,11 +149,12 @@
     .system-bar-label {
       font-size: var(--stability-label);
       color: var(--magenta);
-      width: 55px;
+      width: var(--stability-label-width);
       text-transform: uppercase;
       font-weight: 900;
       letter-spacing: 1px;
       font-family: 'Orbitron', monospace;
+      flex: 0 0 auto;
     }
 
     .system-bar {
@@ -114,6 +165,7 @@
       border-radius: 3px;
       overflow: hidden;
       position: relative;
+      min-width: 0;
     }
 
     .system-bar-fill {
@@ -126,11 +178,12 @@
     .system-bar-percent {
       font-size: var(--stability-percent);
       color: var(--cyan);
-      width: 52px;
+      width: var(--stability-percent-width);
       text-align: right;
       font-weight: 900;
       font-family: 'Orbitron', monospace;
       letter-spacing: 1px;
+      flex: 0 0 auto;
     }
 
     /* --- TOP CENTER: COUNTDOWN & EQUALIZER --- */
@@ -138,8 +191,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center; /* center vertically in taller top band */
+      justify-content: center;
       gap: 16px;
+      text-align: center;
     }
 
     .countdown-title {
@@ -157,12 +211,14 @@
       font-size: var(--countdown-font);
       font-weight: 900;
       color: var(--neon-pink);
-      text-shadow:
-        0 0 10px var(--neon-pink),
-        0 0 22px var(--neon-pink),
-        0 0 45px var(--magenta);
-      letter-spacing: 6px;
+      letter-spacing: var(--countdown-letter-spacing);
       line-height: 1;
+
+      /* Glow strength controlled by vars above */
+      text-shadow:
+        0 0 var(--countdown-glow-1) rgba(255, 16, 240, var(--countdown-glow-alpha)),
+        0 0 var(--countdown-glow-2) rgba(255, 16, 240, var(--countdown-glow-alpha)),
+        0 0 var(--countdown-glow-3) rgba(255, 0, 110, calc(var(--countdown-glow-alpha) * 0.9));
     }
 
     .countdown-label {
@@ -305,6 +361,7 @@
       align-items: center;
       box-shadow: 0 0 18px rgba(0, 217, 255, 0.12);
       padding: 0 12px;
+      min-width: 0;
     }
 
     .ticker {
@@ -408,7 +465,6 @@
       color: var(--neon-pink);
       line-height: 1.15;
       text-shadow: none;
-      /* JS will auto-fit this to the available space */
     }
 
     .guest-real-name {
@@ -417,7 +473,6 @@
       letter-spacing: 0.5px;
       font-weight: 900;
       font-family: 'Orbitron', monospace;
-      /* JS will auto-fit this too */
     }
 
     ::-webkit-scrollbar { display: none; }
@@ -502,23 +557,26 @@
   <script>
     /**********************************************************************
      * ===================== SUPER OBVIOUS CONFIG =========================
-     * 1) SET YOUR COUNTDOWN TARGET TIME HERE
+     *
+     * A) SET YOUR COUNTDOWN TARGET TIME HERE
+     *    - hours is 0–23 (military time)
+     *    - Example: 22:00:00 means 10:00 PM
      **********************************************************************/
     const COUNTDOWN_TARGET_TIME = { hours: 22, minutes: 0, seconds: 0 }; // <-- EDIT THIS
 
     /**********************************************************************
-     * 2) SUPABASE CONNECTION
+     * B) SUPABASE CONNECTION
      *    (Make sure this is your ANON key, NOT service_role)
      **********************************************************************/
     const SUPABASE_URL = 'https://hnlgehudesxzhmeubbxr.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_iRerfEFzpd4LWrauNc0jRA_TGj8uA_O';
 
     /**********************************************************************
-     * 3) BEHAVIOR
+     * C) BEHAVIOR TUNING
      **********************************************************************/
     const CONFIG = {
       MAX_GUESTS: 20,
-      SPOTLIGHT_ROTATE_MS: 15000, // requested
+      SPOTLIGHT_ROTATE_MS: 15000, // rotates checked-in guests
     };
 
     // ---- Prevent "Identifier 'supabase' already declared" issues ----
@@ -598,7 +656,6 @@
     }
 
     function getCheckedInGuestsSorted() {
-      // Only guests with real_name count as "checked in"
       const guests = Array.from(guestMap.values()).filter(g => g && g.real_name);
       guests.sort((a, b) => {
         const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
@@ -623,7 +680,6 @@
       let size = maxPx;
       el.style.fontSize = size + 'px';
 
-      // Reduce until it fits width
       while (size > minPx && el.scrollWidth > el.clientWidth) {
         size -= 1;
         el.style.fontSize = size + 'px';
@@ -633,8 +689,6 @@
     function fitPolaroidText(card) {
       const nameEl = card.querySelector('.guest-character');
       const realEl = card.querySelector('.guest-real-name');
-
-      // Give them a width to measure against (they are centered, so this works fine)
       fitText(nameEl, 18, 10);
       fitText(realEl, 13, 9);
     }
@@ -661,7 +715,6 @@
       photoWall.appendChild(card);
       cardMap.set(guest.character_name, card);
 
-      // Fit text after it’s in DOM
       requestAnimationFrame(() => fitPolaroidText(card));
     }
 
@@ -674,7 +727,6 @@
       if (nameEl) nameEl.textContent = guest.character_name ?? '';
       if (realEl) realEl.textContent = guest.real_name ?? '';
 
-      // Update image if needed
       const img = card.querySelector('img.guest-image');
       if (guest.photo_url) {
         if (img) {
@@ -725,7 +777,6 @@
     // ============= SUPABASE REALTIME + INITIAL LOAD =============
     async function initializeGuests() {
       try {
-        // Initial fetch: checked-in guests only
         const { data, error } = await sb
           .from('guests')
           .select('*')
@@ -737,7 +788,6 @@
           return;
         }
 
-        // Load initial (no pulse for existing)
         data.slice(0, CONFIG.MAX_GUESTS).forEach(guest => {
           if (guest?.character_name && guest?.real_name) {
             guestMap.set(guest.character_name, guest);
@@ -748,8 +798,7 @@
         updateGuestCountTicker();
         renderSpotlight();
 
-        // Real-time subscription
-        const channel = sb
+        sb
           .channel('guests-realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'guests' }, (payload) => {
             const guest = payload.new;
@@ -758,12 +807,9 @@
             const wasCheckedIn = !!guestMap.get(guest.character_name)?.real_name;
             const isCheckedIn  = !!guest.real_name;
 
-            // update map always
             guestMap.set(guest.character_name, guest);
 
-            // If it just became checked-in (real_name went from null -> value)
             if (!wasCheckedIn && isCheckedIn) {
-              // only render if we still have room
               const currentCount = getCheckedInGuestsSorted().length;
               if (currentCount <= CONFIG.MAX_GUESTS && !cardMap.has(guest.character_name)) {
                 renderNewGuest(guest, { isNew: true });
@@ -771,7 +817,6 @@
                 updateExistingGuestCard(guest);
               }
             } else if (isCheckedIn && cardMap.has(guest.character_name)) {
-              // normal update (photo changed, name changed, etc.)
               updateExistingGuestCard(guest);
             }
 
@@ -791,11 +836,8 @@
       updateCountdown();
       initializeGuests();
 
-      // loops
       setInterval(updateCountdown, 1000);
       setInterval(renderSpotlight, CONFIG.SPOTLIGHT_ROTATE_MS);
-
-      // keep ticker count fresh even if nothing else triggers
       setInterval(updateGuestCountTicker, 5000);
     }
 
